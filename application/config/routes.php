@@ -26,3 +26,11 @@ $route['admin/users/store'] = 'admin/users/store';
 $route['admin/users/edit/(:num)'] = 'admin/users/edit/$1';
 $route['admin/users/update/(:num)'] = 'admin/users/update/$1';
 $route['admin/users/change-status/(:num)'] = 'admin/users/change_status/$1';
+
+$route['admin/patients'] = 'admin/patients/index';
+$route['admin/patients/ajax-list'] = 'admin/patients/get_patients_ajax';
+$route['admin/patients/create'] = 'admin/patients/create';
+$route['admin/patients/store'] = 'admin/patients/store';
+$route['admin/patients/edit/(:num)'] = 'admin/patients/edit/$1';
+$route['admin/patients/update/(:num)'] = 'admin/patients/update/$1';
+$route['admin/patients/change-status/(:num)'] = 'admin/patients/change_status/$1';
