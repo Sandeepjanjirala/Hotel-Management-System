@@ -27,6 +27,14 @@ $route['admin/users/edit/(:num)'] = 'admin/users/edit/$1';
 $route['admin/users/update/(:num)'] = 'admin/users/update/$1';
 $route['admin/users/change-status/(:num)'] = 'admin/users/change_status/$1';
 
+$route['admin/doctors'] = 'admin/admin_doctors/index';
+$route['admin/doctors/ajax-list'] = 'admin/admin_doctors/get_doctors_ajax';
+$route['admin/doctors/options'] = 'admin/admin_doctors/get_setup_options';
+$route['admin/doctors/store'] = 'admin/admin_doctors/store';
+$route['admin/doctors/edit/(:num)'] = 'admin/admin_doctors/edit/$1';
+$route['admin/doctors/update/(:num)'] = 'admin/admin_doctors/update/$1';
+$route['admin/doctors/change-status/(:num)'] = 'admin/admin_doctors/change_status/$1';
+
 $route['admin/patients'] = 'admin/patients/index';
 $route['admin/patients/ajax-list'] = 'admin/patients/get_patients_ajax';
 $route['admin/patients/create'] = 'admin/patients/create';
