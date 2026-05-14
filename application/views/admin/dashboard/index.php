@@ -25,7 +25,7 @@
                         <div class="col-md-8">
                             <h3 class="mb-2">Welcome, <?php echo html_escape($current_user_name); ?></h3>
                             <p class="text-muted mb-0">
-                                Live administrative overview for departments and staff accounts.
+                                Live administrative overview for departments, staff accounts, and appointments.
                             </p>
                         </div>
                         <div class="col-md-4 text-md-right mt-3 mt-md-0">
@@ -44,9 +44,7 @@
                             <h3><?php echo (int) $statistics['total_departments']; ?></h3>
                             <p>Total Departments</p>
                         </div>
-                        <div class="icon">
-                            <i class="fas fa-building"></i>
-                        </div>
+                        <div class="icon"><i class="fas fa-building"></i></div>
                         <a href="<?php echo site_url('admin/departments'); ?>" class="small-box-footer">
                             Manage Departments <i class="fas fa-arrow-circle-right"></i>
                         </a>
@@ -59,9 +57,7 @@
                             <h3><?php echo (int) $statistics['total_doctors']; ?></h3>
                             <p>Total Doctors</p>
                         </div>
-                        <div class="icon">
-                            <i class="fas fa-user-md"></i>
-                        </div>
+                        <div class="icon"><i class="fas fa-user-md"></i></div>
                         <a href="<?php echo site_url('admin/users'); ?>" class="small-box-footer">
                             Manage Users <i class="fas fa-arrow-circle-right"></i>
                         </a>
@@ -74,9 +70,7 @@
                             <h3><?php echo (int) $statistics['total_receptionists']; ?></h3>
                             <p>Total Receptionists</p>
                         </div>
-                        <div class="icon">
-                            <i class="fas fa-user-nurse"></i>
-                        </div>
+                        <div class="icon"><i class="fas fa-user-nurse"></i></div>
                         <a href="<?php echo site_url('admin/users'); ?>" class="small-box-footer">
                             Manage Users <i class="fas fa-arrow-circle-right"></i>
                         </a>
@@ -89,11 +83,37 @@
                             <h3><?php echo (int) $statistics['active_users']; ?></h3>
                             <p>Active Users</p>
                         </div>
-                        <div class="icon">
-                            <i class="fas fa-users"></i>
-                        </div>
+                        <div class="icon"><i class="fas fa-users"></i></div>
                         <a href="<?php echo site_url('admin/users'); ?>" class="small-box-footer">
                             View Accounts <i class="fas fa-arrow-circle-right"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-lg-6 col-md-6 col-12">
+                    <div class="small-box bg-secondary">
+                        <div class="inner">
+                            <h3><?php echo (int) $statistics['total_appointments']; ?></h3>
+                            <p>Total Appointments</p>
+                        </div>
+                        <div class="icon"><i class="fas fa-calendar-alt"></i></div>
+                        <a href="<?php echo site_url('admin/appointments'); ?>" class="small-box-footer">
+                            View Appointments <i class="fas fa-arrow-circle-right"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="col-lg-6 col-md-6 col-12">
+                    <div class="small-box bg-danger">
+                        <div class="inner">
+                            <h3><?php echo (int) $statistics['today_appointments']; ?></h3>
+                            <p>Today's Appointments</p>
+                        </div>
+                        <div class="icon"><i class="fas fa-calendar-day"></i></div>
+                        <a href="<?php echo site_url('admin/appointments'); ?>" class="small-box-footer">
+                            Open Schedule <i class="fas fa-arrow-circle-right"></i>
                         </a>
                     </div>
                 </div>
@@ -122,20 +142,20 @@
 
                 <div class="col-lg-3 col-md-6 col-12">
                     <div class="info-box">
-                        <span class="info-box-icon bg-info"><i class="fas fa-user-md"></i></span>
+                        <span class="info-box-icon bg-info"><i class="fas fa-clock"></i></span>
                         <div class="info-box-content">
-                            <span class="info-box-text">Active Doctors</span>
-                            <span class="info-box-number"><?php echo (int) $status_summary['active_doctors']; ?></span>
+                            <span class="info-box-text">Scheduled Appointments</span>
+                            <span class="info-box-number"><?php echo (int) $status_summary['scheduled_appointments']; ?></span>
                         </div>
                     </div>
                 </div>
 
                 <div class="col-lg-3 col-md-6 col-12">
                     <div class="info-box">
-                        <span class="info-box-icon bg-warning"><i class="fas fa-user-nurse"></i></span>
+                        <span class="info-box-icon bg-success"><i class="fas fa-calendar-check"></i></span>
                         <div class="info-box-content">
-                            <span class="info-box-text">Active Receptionists</span>
-                            <span class="info-box-number"><?php echo (int) $status_summary['active_receptionists']; ?></span>
+                            <span class="info-box-text">Completed Appointments</span>
+                            <span class="info-box-number"><?php echo (int) $status_summary['completed_appointments']; ?></span>
                         </div>
                     </div>
                 </div>
@@ -186,17 +206,9 @@
                                                     : '-';
                                             ?>
                                             <tr>
-                                                <td>
-                                                    <strong><?php echo html_escape($user['name']); ?></strong>
-                                                </td>
-                                                <td>
-                                                    <span class="badge <?php echo $role_badge; ?>">
-                                                        <?php echo html_escape(ucfirst($role)); ?>
-                                                    </span>
-                                                </td>
-                                                <td>
-                                                    <?php echo !empty($user['department_name']) ? html_escape($user['department_name']) : '-'; ?>
-                                                </td>
+                                                <td><strong><?php echo html_escape($user['name']); ?></strong></td>
+                                                <td><span class="badge <?php echo $role_badge; ?>"><?php echo html_escape(ucfirst($role)); ?></span></td>
+                                                <td><?php echo !empty($user['department_name']) ? html_escape($user['department_name']) : '-'; ?></td>
                                                 <td>
                                                     <?php if ((int) $user['status'] === 1): ?>
                                                         <span class="badge badge-success">Active</span>
@@ -209,9 +221,7 @@
                                         <?php endforeach; ?>
                                     <?php else: ?>
                                         <tr>
-                                            <td colspan="5" class="text-center text-muted py-4">
-                                                No users found.
-                                            </td>
+                                            <td colspan="5" class="text-center text-muted py-4">No users found.</td>
                                         </tr>
                                     <?php endif; ?>
                                 </tbody>
@@ -246,14 +256,12 @@
                                     <?php if (!empty($recent_departments)): ?>
                                         <?php foreach ($recent_departments as $department): ?>
                                             <?php
-                                                $department_created_date = !empty($department['created_at'])
+                                                $created_date = !empty($department['created_at'])
                                                     ? date('d M Y', strtotime($department['created_at']))
                                                     : '-';
                                             ?>
                                             <tr>
-                                                <td>
-                                                    <strong><?php echo html_escape($department['department_name']); ?></strong>
-                                                </td>
+                                                <td><strong><?php echo html_escape($department['department_name']); ?></strong></td>
                                                 <td>
                                                     <?php if ((int) $department['status'] === 1): ?>
                                                         <span class="badge badge-success">Active</span>
@@ -261,14 +269,12 @@
                                                         <span class="badge badge-secondary">Inactive</span>
                                                     <?php endif; ?>
                                                 </td>
-                                                <td><?php echo html_escape($department_created_date); ?></td>
+                                                <td><?php echo html_escape($created_date); ?></td>
                                             </tr>
                                         <?php endforeach; ?>
                                     <?php else: ?>
                                         <tr>
-                                            <td colspan="3" class="text-center text-muted py-4">
-                                                No departments found.
-                                            </td>
+                                            <td colspan="3" class="text-center text-muted py-4">No departments found.</td>
                                         </tr>
                                     <?php endif; ?>
                                 </tbody>

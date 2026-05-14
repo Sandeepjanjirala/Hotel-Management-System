@@ -5,6 +5,7 @@ class Dashboard_model extends CI_Model
 {
     protected $users_table = 'users';
     protected $departments_table = 'departments';
+    protected $appointments_table = 'appointments';
     protected $managed_roles = array('admin', 'doctor', 'receptionist');
 
     public function __construct()
@@ -18,7 +19,9 @@ class Dashboard_model extends CI_Model
             'total_departments' => $this->count_departments(),
             'total_doctors' => $this->count_users_by_role('doctor'),
             'total_receptionists' => $this->count_users_by_role('receptionist'),
-            'active_users' => $this->count_active_users()
+            'active_users' => $this->count_active_users(),
+            'total_appointments' => $this->count_appointments(),
+            'today_appointments' => $this->count_appointments_by_date(date('Y-m-d'))
         );
     }
 
@@ -28,7 +31,10 @@ class Dashboard_model extends CI_Model
             'active_departments' => $this->count_departments_by_status(1),
             'inactive_departments' => $this->count_departments_by_status(0),
             'active_doctors' => $this->count_users_by_role_and_status('doctor', 1),
-            'active_receptionists' => $this->count_users_by_role_and_status('receptionist', 1)
+            'active_receptionists' => $this->count_users_by_role_and_status('receptionist', 1),
+            'scheduled_appointments' => $this->count_appointments_by_status('scheduled'),
+            'completed_appointments' => $this->count_appointments_by_status('completed'),
+            'cancelled_appointments' => $this->count_appointments_by_status('cancelled')
         );
     }
 
@@ -59,9 +65,7 @@ class Dashboard_model extends CI_Model
 
     public function count_departments()
     {
-        return (int) $this->db
-            ->from($this->departments_table)
-            ->count_all_results();
+        return (int) $this->db->from($this->departments_table)->count_all_results();
     }
 
     public function count_departments_by_status($status)
@@ -95,6 +99,29 @@ class Dashboard_model extends CI_Model
             ->from($this->users_table)
             ->where_in('role', $this->managed_roles)
             ->where('status', 1)
+            ->count_all_results();
+    }
+
+    public function count_appointments()
+    {
+        return (int) $this->db
+            ->from($this->appointments_table)
+            ->count_all_results();
+    }
+
+    public function count_appointments_by_status($status)
+    {
+        return (int) $this->db
+            ->from($this->appointments_table)
+            ->where('status', $status)
+            ->count_all_results();
+    }
+
+    public function count_appointments_by_date($date)
+    {
+        return (int) $this->db
+            ->from($this->appointments_table)
+            ->where('appointment_date', $date)
             ->count_all_results();
     }
 }

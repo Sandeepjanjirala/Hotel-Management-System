@@ -60,14 +60,14 @@ $home_url = ($sidebar_role === 'admin') ? site_url('admin') : site_url('admin/pa
                     </a>
                 </li>
 
-                <?php if ($sidebar_role === 'admin'): ?>
-                    <li class="nav-item">
-                        <a href="#" class="nav-link">
-                            <i class="nav-icon fas fa-calendar-check"></i>
-                            <p>Appointments</p>
-                        </a>
-                    </li>
+                <li class="nav-item">
+                    <a href="<?php echo site_url('admin/appointments'); ?>" class="nav-link <?php echo ($active_menu === 'appointments') ? 'active' : ''; ?>">
+                        <i class="nav-icon fas fa-calendar-check"></i>
+                        <p>Appointments</p>
+                    </a>
+                </li>
 
+                <?php if ($sidebar_role === 'admin'): ?>
                     <li class="nav-item">
                         <a href="#" class="nav-link">
                             <i class="nav-icon fas fa-file-invoice-dollar"></i>
