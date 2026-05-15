@@ -91,6 +91,13 @@ if ($sidebar_role === 'admin') {
                             <p>Appointments</p>
                         </a>
                     </li>
+
+                    <li class="nav-item">
+                        <a href="<?php echo site_url('admin/pharmacy-billing'); ?>" class="nav-link <?php echo ($active_menu === 'pharmacy_billing') ? 'active' : ''; ?>">
+                            <i class="nav-icon fas fa-file-medical-alt"></i>
+                            <p>Pharmacy Billing</p>
+                        </a>
+                    </li>
                 <?php endif; ?>
 
                 <?php if ($sidebar_role === 'admin' || $sidebar_role === 'doctor'): ?>
@@ -98,15 +105,6 @@ if ($sidebar_role === 'admin') {
                         <a href="<?php echo site_url('admin/prescriptions'); ?>" class="nav-link <?php echo ($active_menu === 'prescriptions') ? 'active' : ''; ?>">
                             <i class="nav-icon fas fa-prescription"></i>
                             <p>Prescriptions</p>
-                        </a>
-                    </li>
-                <?php endif; ?>
-
-                <?php if ($sidebar_role === 'admin'): ?>
-                    <li class="nav-item">
-                        <a href="#" class="nav-link">
-                            <i class="nav-icon fas fa-file-invoice-dollar"></i>
-                            <p>Billing</p>
                         </a>
                     </li>
                 <?php endif; ?>
