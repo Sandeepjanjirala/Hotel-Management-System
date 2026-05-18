@@ -75,6 +75,13 @@ if ($sidebar_role === 'admin') {
                             <p>Medicines</p>
                         </a>
                     </li>
+
+                    <li class="nav-item">
+                        <a href="<?php echo site_url('admin/lab-tests'); ?>" class="nav-link <?php echo ($active_menu === 'lab_tests') ? 'active' : ''; ?>">
+                            <i class="nav-icon fas fa-vials"></i>
+                            <p>Lab Tests</p>
+                        </a>
+                    </li>
                 <?php endif; ?>
 
                 <?php if ($sidebar_role === 'admin' || $sidebar_role === 'receptionist'): ?>
@@ -105,6 +112,15 @@ if ($sidebar_role === 'admin') {
                         <a href="<?php echo site_url('admin/prescriptions'); ?>" class="nav-link <?php echo ($active_menu === 'prescriptions') ? 'active' : ''; ?>">
                             <i class="nav-icon fas fa-prescription"></i>
                             <p>Prescriptions</p>
+                        </a>
+                    </li>
+                <?php endif; ?>
+
+                <?php if ($sidebar_role === 'admin' || $sidebar_role === 'doctor' || $sidebar_role === 'receptionist'): ?>
+                    <li class="nav-item">
+                        <a href="<?php echo site_url('admin/lab-requests'); ?>" class="nav-link <?php echo ($active_menu === 'lab_requests') ? 'active' : ''; ?>">
+                            <i class="nav-icon fas fa-flask"></i>
+                            <p>Lab Requests</p>
                         </a>
                     </li>
                 <?php endif; ?>
