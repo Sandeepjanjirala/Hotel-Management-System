@@ -66,3 +66,11 @@ $route['admin/pharmacy-billing/ajax-list'] = 'admin/admin_pharmacy/get_bills_aja
 $route['admin/pharmacy-billing/create'] = 'admin/admin_pharmacy/create';
 $route['admin/pharmacy-billing/store'] = 'admin/admin_pharmacy/store';
 
+$route['admin/billing'] = 'admin/admin_billing/index';
+$route['admin/billing/ajax-list'] = 'admin/admin_billing/get_bills_ajax';
+$route['admin/billing/create'] = 'admin/admin_billing/create';
+$route['admin/billing/create/(:num)'] = 'admin/admin_billing/create/$1';
+$route['admin/billing/preview/(:num)'] = 'admin/admin_billing/preview/$1';
+$route['admin/billing/store'] = 'admin/admin_billing/store';
+$route['admin/billing/view/(:num)'] = 'admin/admin_billing/view/$1';
+$route['admin/billing/pdf/(:num)'] = 'admin/admin_billing/pdf/$1';

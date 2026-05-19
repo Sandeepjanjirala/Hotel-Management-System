@@ -105,6 +105,13 @@ if ($sidebar_role === 'admin') {
                             <p>Pharmacy Billing</p>
                         </a>
                     </li>
+
+                    <li class="nav-item">
+                        <a href="<?php echo site_url('admin/billing'); ?>" class="nav-link <?php echo ($active_menu === 'billing') ? 'active' : ''; ?>">
+                            <i class="nav-icon fas fa-file-invoice-dollar"></i>
+                            <p>Billing</p>
+                        </a>
+                    </li>
                 <?php endif; ?>
 
                 <?php if ($sidebar_role === 'admin' || $sidebar_role === 'doctor'): ?>
