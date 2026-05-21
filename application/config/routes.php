@@ -74,3 +74,10 @@ $route['admin/billing/preview/(:num)'] = 'admin/admin_billing/preview/$1';
 $route['admin/billing/store'] = 'admin/admin_billing/store';
 $route['admin/billing/view/(:num)'] = 'admin/admin_billing/view/$1';
 $route['admin/billing/pdf/(:num)'] = 'admin/admin_billing/pdf/$1';
+
+$route['admin/reports'] = 'admin/admin_reports/index';
+$route['admin/reports/revenue-analytics'] = 'admin/admin_reports/revenue_analytics';
+$route['admin/reports/appointment-analytics'] = 'admin/admin_reports/appointment_analytics';
+$route['admin/reports/patient-analytics'] = 'admin/admin_reports/patient_analytics';
+$route['admin/reports/doctor-analytics'] = 'admin/admin_reports/doctor_analytics';
+$route['admin/reports/lab-analytics'] = 'admin/admin_reports/lab_analytics';

@@ -252,7 +252,7 @@ class Admin_billing extends MY_Controller
     private function json_response($response)
     {
         $response['csrfHash'] = $this->security->get_csrf_hash();
-
+        
         return $this->output
             ->set_content_type('application/json')
             ->set_output(json_encode($response));
