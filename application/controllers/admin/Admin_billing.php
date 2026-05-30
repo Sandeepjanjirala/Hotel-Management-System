@@ -186,7 +186,7 @@ class Admin_billing extends MY_Controller
         $pdf->Output($invoice['invoice_no'] . '.pdf', 'I');
     }
 
-    private function validate_invoice_form()
+    protected function validate_invoice_form()
     {
         $this->form_validation->set_rules('appointment_id', 'Appointment', 'trim|required|integer');
         $this->form_validation->set_rules('invoice_date', 'Invoice Date', 'trim|required');
@@ -240,7 +240,7 @@ class Admin_billing extends MY_Controller
         );
     }
 
-    private function load_admin_view($view, $data)
+    protected function load_admin_view($view, $data)
     {
         $this->load->view('admin/layouts/header', $data);
         $this->load->view('admin/layouts/navbar', $data);
@@ -249,7 +249,7 @@ class Admin_billing extends MY_Controller
         $this->load->view('admin/layouts/footer', $data);
     }
 
-    private function json_response($response)
+    protected function json_response($response, $status_code = 200)
     {
         $response['csrfHash'] = $this->security->get_csrf_hash();
         

@@ -164,7 +164,7 @@ class Admin_medicines extends MY_Controller
         ));
     }
 
-    private function validate_medicine_form($medicine_id = NULL)
+    protected function validate_medicine_form($medicine_id = NULL)
     {
         $post_data = $this->input->post(NULL, TRUE);
 
@@ -222,7 +222,7 @@ class Admin_medicines extends MY_Controller
         );
     }
 
-    private function json_response($response)
+    protected function json_response($response, $status_code = 200)
     {
         $response['csrfHash'] = $this->security->get_csrf_hash();
 

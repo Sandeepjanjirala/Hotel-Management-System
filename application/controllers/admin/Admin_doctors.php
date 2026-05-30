@@ -169,7 +169,7 @@ class Admin_doctors extends MY_Controller
         ));
     }
 
-    private function validate_doctor_form($mode)
+    protected function validate_doctor_form($mode)
     {
         $post_data = $this->input->post(NULL, TRUE);
 
@@ -255,7 +255,7 @@ class Admin_doctors extends MY_Controller
         );
     }
 
-    private function json_response($response)
+    protected function json_response($response, $status_code = 200)
     {
         $response['csrfHash'] = $this->security->get_csrf_hash();
 

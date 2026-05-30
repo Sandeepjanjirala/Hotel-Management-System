@@ -197,7 +197,7 @@ class Appointments extends MY_Controller
         ));
     }
 
-    private function validate_appointment_form($is_update = FALSE)
+    protected function validate_appointment_form($is_update = FALSE)
     {
         $this->form_validation->set_rules('patient_id', 'Patient', 'trim|required|integer');
         $this->form_validation->set_rules('doctor_id', 'Doctor', 'trim|required|integer');
@@ -228,7 +228,7 @@ class Appointments extends MY_Controller
         return TRUE;
     }
 
-    private function appointment_form_data()
+    protected function appointment_form_data()
     {
         $reason = trim((string) $this->input->post('reason', TRUE));
         $notes = trim((string) $this->input->post('notes', TRUE));
@@ -244,7 +244,7 @@ class Appointments extends MY_Controller
         );
     }
 
-    private function json_response($response)
+    protected function json_response($response, $status_code = 200)
     {
         $response['csrfHash'] = $this->security->get_csrf_hash();
 

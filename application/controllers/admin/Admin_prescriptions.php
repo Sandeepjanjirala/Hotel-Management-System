@@ -188,7 +188,7 @@ class Admin_prescriptions extends MY_Controller
         ));
     }
 
-    private function validate_prescription_form(&$appointment, &$validated_items)
+    protected function validate_prescription_form(&$appointment, &$validated_items)
     {
         $this->form_validation->set_rules('appointment_id', 'Appointment', 'trim|required|integer');
         $this->form_validation->set_rules('symptoms', 'Symptoms', 'trim|required');
@@ -260,7 +260,7 @@ class Admin_prescriptions extends MY_Controller
         return TRUE;
     }
 
-    private function json_response($response)
+    protected function json_response($response, $status_code = 200)
     {
         $response['csrfHash'] = $this->security->get_csrf_hash();
 

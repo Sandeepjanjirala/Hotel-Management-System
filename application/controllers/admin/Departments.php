@@ -160,7 +160,7 @@ class Departments extends MY_Controller
         ));
     }
 
-    private function validate_department_form($department_id = NULL)
+    protected function validate_department_form($department_id = NULL)
     {
         $post_data = $this->input->post(NULL, TRUE);
 
@@ -200,14 +200,14 @@ class Departments extends MY_Controller
         );
     }
 
-    private function normalize_description($description)
+    protected function normalize_description($description)
     {
         $description = trim((string) $description);
 
         return ($description === '') ? NULL : $description;
     }
 
-    private function json_response($response)
+    protected function json_response($response, $status_code = 200)
     {
         $response['csrfHash'] = $this->security->get_csrf_hash();
 

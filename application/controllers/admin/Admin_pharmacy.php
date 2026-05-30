@@ -129,7 +129,7 @@ class Admin_pharmacy extends MY_Controller
         ));
     }
 
-    private function validate_bill_form(&$prescription, &$validated_items, &$total_amount)
+    protected function validate_bill_form(&$prescription, &$validated_items, &$total_amount)
     {
         $this->form_validation->set_rules('prescription_id', 'Prescription', 'trim|required|integer');
         $this->form_validation->set_rules('bill_date', 'Bill Date', 'trim|required');
@@ -234,7 +234,7 @@ class Admin_pharmacy extends MY_Controller
         return TRUE;
     }
 
-    private function json_response($response)
+    protected function json_response($response, $status_code = 200)
     {
         $response['csrfHash'] = $this->security->get_csrf_hash();
 

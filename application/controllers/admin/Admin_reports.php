@@ -72,7 +72,7 @@ class Admin_reports extends MY_Controller
         ));
     }
 
-    private function get_date_filters()
+    protected function get_date_filters()
     {
         $start_date = $this->input->post('start_date', true);
         $end_date = $this->input->post('end_date', true);
@@ -97,7 +97,7 @@ class Admin_reports extends MY_Controller
         );
     }
 
-    private function is_valid_date($date)
+    protected function is_valid_date($date)
     {
         if (!$date) {
             return false;
@@ -107,7 +107,7 @@ class Admin_reports extends MY_Controller
         return $d && $d->format('Y-m-d') === $date;
     }
 
-    private function json_response($response)
+    protected function json_response($response, $status_code = 200)
     {
         $response['csrfHash'] = $this->security->get_csrf_hash();
 

@@ -174,7 +174,7 @@ class Patients extends MY_Controller
         ));
     }
 
-    private function validate_patient_form()
+    protected function validate_patient_form()
     {
         $this->form_validation->set_rules('full_name', 'Full Name', 'trim|required|max_length[150]');
         $this->form_validation->set_rules('gender', 'Gender', 'trim|required|in_list[male,female,other]');
@@ -189,7 +189,7 @@ class Patients extends MY_Controller
         return $this->form_validation->run();
     }
 
-    private function patient_form_data()
+    protected function patient_form_data()
     {
         $email = trim((string) $this->input->post('email', TRUE));
         $dob = trim((string) $this->input->post('dob', TRUE));
@@ -210,7 +210,7 @@ class Patients extends MY_Controller
         );
     }
 
-    private function json_response($response)
+    protected function json_response($response, $status_code = 200)
     {
         $response['csrfHash'] = $this->security->get_csrf_hash();
 

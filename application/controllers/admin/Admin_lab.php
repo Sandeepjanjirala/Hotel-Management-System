@@ -313,7 +313,7 @@ class Admin_lab extends MY_Controller
         ));
     }
 
-    private function validate_test_form($test_id = NULL)
+    protected function validate_test_form($test_id = NULL)
     {
         $post_data = $this->input->post(NULL, TRUE);
 
@@ -365,7 +365,7 @@ class Admin_lab extends MY_Controller
         );
     }
 
-    private function validate_request_form(&$appointment, &$lab_test_ids)
+    protected function validate_request_form(&$appointment, &$lab_test_ids)
     {
         $this->form_validation->set_rules('appointment_id', 'Appointment', 'trim|required|integer');
         $this->form_validation->set_rules('request_date', 'Request Date', 'trim|required');
@@ -402,7 +402,7 @@ class Admin_lab extends MY_Controller
         return TRUE;
     }
 
-    private function load_admin_view($view, $data)
+    protected function load_admin_view($view, $data)
     {
         $this->load->view('admin/layouts/header', $data);
         $this->load->view('admin/layouts/navbar', $data);
@@ -411,7 +411,7 @@ class Admin_lab extends MY_Controller
         $this->load->view('admin/layouts/footer', $data);
     }
 
-    private function json_response($response)
+    protected function json_response($response, $status_code = 200)
     {
         $response['csrfHash'] = $this->security->get_csrf_hash();
 

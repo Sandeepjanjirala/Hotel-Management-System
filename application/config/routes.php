@@ -5,14 +5,32 @@ $route['default_controller'] = 'auth';
 $route['404_override'] = '';
 $route['translate_uri_dashes'] = FALSE;
 
+/*
+|--------------------------------------------------------------------------
+| Authentication
+|--------------------------------------------------------------------------
+*/
+
 $route['login'] = 'auth/index';
 $route['auth/login'] = 'auth/login';
 $route['logout'] = 'auth/logout';
 
+/*
+|--------------------------------------------------------------------------
+| Role Dashboards
+|--------------------------------------------------------------------------
+*/
+
 $route['admin'] = 'admin/dashboard';
-$route['doctor'] = 'doctor/doctor_dashboard';
+$route['doctor'] = 'doctor/dashboard';
 $route['receptionist'] = 'receptionist/rec_dashboard';
 $route['patient'] = 'patient/patient_dashboard';
+
+/*
+|--------------------------------------------------------------------------
+| Admin Lab
+|--------------------------------------------------------------------------
+*/
 
 $route['admin/lab-tests'] = 'admin/admin_lab/tests';
 $route['admin/lab-tests/ajax-list'] = 'admin/admin_lab/get_tests_ajax';
@@ -29,7 +47,6 @@ $route['admin/lab-requests/appointment/(:num)'] = 'admin/admin_lab/get_appointme
 $route['admin/lab-requests/change-status/(:num)'] = 'admin/admin_lab/change_request_status/$1';
 $route['admin/lab-requests/results/(:num)'] = 'admin/admin_lab/results/$1';
 $route['admin/lab-requests/save-results/(:num)'] = 'admin/admin_lab/save_results/$1';
-
 
 /*
 |--------------------------------------------------------------------------
@@ -66,6 +83,12 @@ $route['admin/pharmacy-billing/ajax-list'] = 'admin/admin_pharmacy/get_bills_aja
 $route['admin/pharmacy-billing/create'] = 'admin/admin_pharmacy/create';
 $route['admin/pharmacy-billing/store'] = 'admin/admin_pharmacy/store';
 
+/*
+|--------------------------------------------------------------------------
+| Billing
+|--------------------------------------------------------------------------
+*/
+
 $route['admin/billing'] = 'admin/admin_billing/index';
 $route['admin/billing/ajax-list'] = 'admin/admin_billing/get_bills_ajax';
 $route['admin/billing/create'] = 'admin/admin_billing/create';
@@ -75,9 +98,38 @@ $route['admin/billing/store'] = 'admin/admin_billing/store';
 $route['admin/billing/view/(:num)'] = 'admin/admin_billing/view/$1';
 $route['admin/billing/pdf/(:num)'] = 'admin/admin_billing/pdf/$1';
 
+/*
+|--------------------------------------------------------------------------
+| Reports
+|--------------------------------------------------------------------------
+*/
+
 $route['admin/reports'] = 'admin/admin_reports/index';
 $route['admin/reports/revenue-analytics'] = 'admin/admin_reports/revenue_analytics';
 $route['admin/reports/appointment-analytics'] = 'admin/admin_reports/appointment_analytics';
 $route['admin/reports/patient-analytics'] = 'admin/admin_reports/patient_analytics';
 $route['admin/reports/doctor-analytics'] = 'admin/admin_reports/doctor_analytics';
 $route['admin/reports/lab-analytics'] = 'admin/admin_reports/lab_analytics';
+
+/*
+|--------------------------------------------------------------------------
+| Doctor Panel
+|--------------------------------------------------------------------------
+*/
+
+$route['doctor/dashboard'] = 'doctor/dashboard';
+$route['doctor/dashboard/stats'] = 'doctor/dashboard/stats';
+
+$route['doctor/appointments'] = 'doctor/appointments';
+$route['doctor/appointments/ajax-list'] = 'doctor/appointments/ajax_list';
+$route['doctor/appointments/view/(:num)'] = 'doctor/appointments/view/$1';
+
+$route['doctor/patients'] = 'doctor/patients';
+$route['doctor/patients/ajax-list'] = 'doctor/patients/ajax_list';
+$route['doctor/patients/view/(:num)'] = 'doctor/patients/view/$1';
+
+$route['doctor/prescriptions/create/(:num)'] = 'doctor/prescriptions/create/$1';
+$route['doctor/prescriptions/store'] = 'doctor/prescriptions/store';
+
+$route['doctor/lab-requests/create/(:num)'] = 'doctor/lab_requests/create/$1';
+$route['doctor/lab-requests/store'] = 'doctor/lab_requests/store';
