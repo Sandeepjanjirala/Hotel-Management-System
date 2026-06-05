@@ -111,7 +111,7 @@ class MY_Controller extends CI_Controller
         $name = $this->session_first_value($keys);
         return $name ?: 'User';
     }
-   protected function current_user_email()
+    protected function current_user_email()
     {
         $session_config = isset($this->panel_config['session']) ? $this->panel_config['session'] : array();
         $keys = isset($session_config['email_keys'])
@@ -259,5 +259,77 @@ abstract class Doctor_Controller extends Role_Controller
             : 'auth/logout';
 
         parent::render($view, $data, $layout);
+    }
+}
+abstract class Receptionist_Controller extends MY_Controller
+{
+    protected $layout = 'receptionist/layouts/main';
+    protected $receptionist_user_id;
+
+    public function __construct()
+    {
+        parent::__construct();
+
+        $this->require_receptionist_role();
+        $this->receptionist_user_id = (int) $this->current_user_id();
+    }
+
+    protected function require_receptionist_role()
+    {
+        if (!$this->session->userdata('logged_in') || !$this->current_user_id()) {
+            if ($this->input->is_ajax_request()) {
+                $this->json_response(array(
+                    'success' => false,
+                    'message' => 'Authentication required.'
+                ), 401);
+                exit;
+            }
+
+            redirect('login');
+            exit;
+        }
+
+        $current_role = strtolower((string) $this->current_user_role());
+        if ($current_role === 'receptionist') {
+            return true;
+        }
+
+        if ($this->input->is_ajax_request()) {
+            $this->json_response(array(
+                'success' => false,
+                'message' => 'Receptionist role required.'
+            ), 403);
+            exit;
+        }
+
+        $this->session->set_flashdata('error', 'Receptionist role required.');
+        redirect($this->role_home_uri($current_role));
+        exit;
+    }
+
+    protected function role_home_uri($role)
+    {
+        switch (strtolower((string) $role)) {
+            case 'admin':
+                return 'admin';
+            case 'doctor':
+                return 'doctor';
+            case 'patient':
+                return 'patient';
+            case 'receptionist':
+                return 'receptionist';
+            default:
+                return 'login';
+        }
+    }
+
+    protected function render($view, $data = array(), $layout = null)
+    {
+        $data['receptionist_user_id'] = $this->receptionist_user_id;
+        $data['current_user_name'] = $this->current_user_name();
+        $data['current_user_role'] = $this->current_role();
+        $data['logout_uri'] = 'logout';
+
+        parent::render($view, $data, $layout ?: $this->layout);
     }
 }

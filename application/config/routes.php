@@ -23,7 +23,7 @@ $route['logout'] = 'auth/logout';
 
 $route['admin'] = 'admin/dashboard';
 $route['doctor'] = 'doctor/dashboard';
-$route['receptionist'] = 'receptionist/rec_dashboard';
+$route['receptionist'] = 'receptionist/dashboard';
 $route['patient'] = 'patient/patient_dashboard';
 
 /*
@@ -133,3 +133,44 @@ $route['doctor/prescriptions/store'] = 'doctor/prescriptions/store';
 
 $route['doctor/lab-requests/create/(:num)'] = 'doctor/lab_requests/create/$1';
 $route['doctor/lab-requests/store'] = 'doctor/lab_requests/store';
+
+/*
+|--------------------------------------------------------------------------
+| Receptionist Panel
+|--------------------------------------------------------------------------
+*/
+
+$route['receptionist/dashboard'] = 'receptionist/dashboard';
+
+$route['receptionist/patients'] = 'receptionist/patients';
+$route['receptionist/patients/ajax-list'] = 'receptionist/patients/ajax_list';
+$route['receptionist/patients/create'] = 'receptionist/patients/create';
+$route['receptionist/patients/store'] = 'receptionist/patients/store';
+$route['receptionist/patients/edit/(:num)'] = 'receptionist/patients/edit/$1';
+$route['receptionist/patients/update/(:num)'] = 'receptionist/patients/update/$1';
+$route['receptionist/patients/view/(:num)'] = 'receptionist/patients/view/$1';
+
+$route['receptionist/appointments'] = 'receptionist/appointments';
+$route['receptionist/appointments/ajax-list'] = 'receptionist/appointments/ajax_list';
+$route['receptionist/appointments/create'] = 'receptionist/appointments/create';
+$route['receptionist/appointments/store'] = 'receptionist/appointments/store';
+$route['receptionist/appointments/edit/(:num)'] = 'receptionist/appointments/edit/$1';
+$route['receptionist/appointments/update/(:num)'] = 'receptionist/appointments/update/$1';
+$route['receptionist/appointments/cancel/(:num)'] = 'receptionist/appointments/cancel/$1';
+$route['receptionist/appointments/doctors'] = 'receptionist/appointments/doctors';
+$route['receptionist/appointments/slots'] = 'receptionist/appointments/slots';
+
+$route['receptionist/billing'] = 'receptionist/billing';
+$route['receptionist/billing/ajax-list'] = 'receptionist/billing/ajax_list';
+$route['receptionist/billing/create'] = 'receptionist/billing/create';
+$route['receptionist/billing/preview/(:num)'] = 'receptionist/billing/preview/$1';
+$route['receptionist/billing/store'] = 'receptionist/billing/store';
+$route['receptionist/billing/view/(:num)'] = 'receptionist/billing/view/$1';
+$route['receptionist/billing/mark-payment/(:num)'] = 'receptionist/billing/mark_payment/$1';
+
+$route['receptionist/pharmacy-billing'] = 'receptionist/pharmacy_billing';
+$route['receptionist/pharmacy-billing/ajax-list'] = 'receptionist/pharmacy_billing/ajax_list';
+$route['receptionist/pharmacy-billing/create'] = 'receptionist/pharmacy_billing/create';
+$route['receptionist/pharmacy-billing/prescription/(:num)'] = 'receptionist/pharmacy_billing/prescription/$1';
+$route['receptionist/pharmacy-billing/store'] = 'receptionist/pharmacy_billing/store';
+$route['receptionist/pharmacy-billing/view/(:num)'] = 'receptionist/pharmacy_billing/view/$1';
