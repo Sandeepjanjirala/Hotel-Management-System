@@ -17,5 +17,11 @@
 
 <script src="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/js/adminlte.min.js"></script>
 
+<script>
+window.HMS_CSRF_NAME = '<?php echo $this->security->get_csrf_token_name(); ?>';
+window.HMS_CSRF_HASH = '<?php echo $this->security->get_csrf_hash(); ?>';
+</script>
+<script src="<?php echo base_url('assets/js/hms-ajax.js'); ?>"></script>
+
 </body>
 </html>

@@ -37,7 +37,7 @@
                 </div>
             <?php endif; ?>
 
-            <div id="patientAlert"></div>
+            <div id="hmsNotificationArea"></div>
 
             <div class="card">
                 <div class="card-header">
@@ -78,7 +78,7 @@
                                     <th style="width: 190px;">Actions</th>
                                 </tr>
                             </thead>
-                            <tbody id="patientsTableBody">
+                            <tbody id="patientsTableBody" data-table-url="<?php echo site_url('admin/patients/ajax-list'); ?>">
                                 <tr>
                                     <td colspan="7" class="text-center">Loading patients...</td>
                                 </tr>
@@ -93,156 +93,48 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function () {
-    var csrfName = '<?php echo $this->security->get_csrf_token_name(); ?>';
-    var csrfHash = '<?php echo $this->security->get_csrf_hash(); ?>';
     var listUrl = '<?php echo site_url('admin/patients/ajax-list'); ?>';
-    var editBaseUrl = '<?php echo site_url('admin/patients/edit'); ?>';
-    var changeStatusBaseUrl = '<?php echo site_url('admin/patients/change-status'); ?>';
-    var searchTimer = null;
-
-    function updateCsrfToken(hash) {
-        if (!hash) {
-            return;
-        }
-
-        csrfHash = hash;
-    }
-
-    function escapeHtml(value) {
-        return $('<div>').text(value === null || value === undefined ? '' : value).html();
-    }
-
-    function showAlert(type, message) {
-        var alertClass = type === 'success' ? 'success' : 'danger';
-        var html = ''
-            + '<div class="alert alert-' + alertClass + ' alert-dismissible fade show" role="alert">'
-            + escapeHtml(message)
-            + '<button type="button" class="close" data-dismiss="alert" aria-label="Close">'
-            + '<span aria-hidden="true">&times;</span>'
-            + '</button>'
-            + '</div>';
-
-        $('#patientAlert').html(html);
-    }
-
-    function genderLabel(gender) {
-        if (!gender) {
-            return '-';
-        }
-
-        return gender.charAt(0).toUpperCase() + gender.slice(1);
-    }
-
-    function renderStatusBadge(status) {
-        if (parseInt(status, 10) === 1) {
-            return '<span class="badge badge-success">Active</span>';
-        }
-
-        return '<span class="badge badge-secondary">Inactive</span>';
-    }
-
-    function renderRows(rows) {
-        var html = '';
-
-        if (!rows || rows.length === 0) {
-            $('#patientsTableBody').html('<tr><td colspan="7" class="text-center">No patients found.</td></tr>');
-            return;
-        }
-
-        $.each(rows, function (index, patient) {
-            var toggleText = parseInt(patient.status, 10) === 1 ? 'Deactivate' : 'Activate';
-            var toggleClass = parseInt(patient.status, 10) === 1 ? 'btn-warning' : 'btn-success';
-
-            html += '<tr>';
-            html += '<td><strong>' + escapeHtml(patient.patient_code) + '</strong></td>';
-            html += '<td>' + escapeHtml(patient.full_name) + '</td>';
-            html += '<td>' + escapeHtml(genderLabel(patient.gender)) + '</td>';
-            html += '<td>' + escapeHtml(patient.blood_group || 'Unknown') + '</td>';
-            html += '<td>' + escapeHtml(patient.phone) + '</td>';
-            html += '<td>' + renderStatusBadge(patient.status) + '</td>';
-            html += '<td>';
-            html += '<a href="' + editBaseUrl + '/' + escapeHtml(patient.id) + '" class="btn btn-info btn-sm mr-1">';
-            html += '<i class="fas fa-edit mr-1"></i>Edit';
-            html += '</a>';
-            html += '<button type="button" class="btn ' + toggleClass + ' btn-sm btn-toggle-status" data-id="' + escapeHtml(patient.id) + '">';
-            html += '<i class="fas fa-sync-alt mr-1"></i>' + toggleText;
-            html += '</button>';
-            html += '</td>';
-            html += '</tr>';
-        });
-
-        $('#patientsTableBody').html(html);
-    }
 
     function loadPatients() {
         $('#patientsTableBody').html('<tr><td colspan="7" class="text-center">Loading patients...</td></tr>');
 
-        $.ajax({
-            url: listUrl,
-            type: 'GET',
-            dataType: 'json',
-            data: {
+        HMSAjax.refreshTable(listUrl, {
                 search: $('#patientSearch').val()
-            },
-            success: function (response) {
-                updateCsrfToken(response.csrfHash);
-
-                if (response.status) {
-                    renderRows(response.data);
-                    return;
-                }
-
-                renderRows([]);
-                showAlert('danger', response.message || 'Unable to load patients.');
-            },
-            error: function () {
-                renderRows([]);
-                showAlert('danger', 'Unable to load patients.');
-            }
-        });
+            }, '#patientsTableBody');
     }
 
-    $('#patientSearch').on('keyup', function () {
-        window.clearTimeout(searchTimer);
-
-        searchTimer = window.setTimeout(function () {
-            loadPatients();
-        }, 300);
-    });
+    $('#patientSearch').on('keyup', HMSAjax.debounce(loadPatients, 300));
 
     $('#clearSearchButton').on('click', function () {
         $('#patientSearch').val('');
         loadPatients();
     });
 
-    $(document).on('click', '.btn-toggle-status', function () {
-        var patientId = $(this).data('id');
+    $(document).on('click', '.js-patient-status', function () {
+        var $button = $(this);
+        var message = $button.data('confirm') || 'Are you sure you want to change this patient status?';
 
-        if (!window.confirm('Are you sure you want to change this patient status?')) {
+        if (!window.confirm(message)) {
             return;
         }
 
-        var payload = {};
-        payload[csrfName] = csrfHash;
-
-        $.ajax({
-            url: changeStatusBaseUrl + '/' + patientId,
+        HMSAjax.request({
+            url: $button.data('url'),
             type: 'POST',
             dataType: 'json',
-            data: payload,
-            success: function (response) {
-                updateCsrfToken(response.csrfHash);
-
+            hmsSuccess: function (response) {
                 if (response.status) {
-                    loadPatients();
-                    showAlert('success', response.message);
+                    if (response.row_html) {
+                        $('#patient-row-' + response.data.id).replaceWith(response.row_html);
+                    } else {
+                        loadPatients();
+                    }
+
+                    HMSAjax.notify('success', response.message);
                     return;
                 }
 
-                showAlert('danger', response.message || 'Unable to change patient status.');
-            },
-            error: function () {
-                showAlert('danger', 'Unable to change patient status.');
+                HMSAjax.notify('error', response.message || 'Unable to change patient status.');
             }
         });
     });

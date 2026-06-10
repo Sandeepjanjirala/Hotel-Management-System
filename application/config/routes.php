@@ -28,6 +28,20 @@ $route['patient'] = 'patient/patient_dashboard';
 
 /*
 |--------------------------------------------------------------------------
+| Admin Patients
+|--------------------------------------------------------------------------
+*/
+
+$route['admin/patients'] = 'admin/patients';
+$route['admin/patients/ajax-list'] = 'admin/patients/get_patients_ajax';
+$route['admin/patients/create'] = 'admin/patients/create';
+$route['admin/patients/store'] = 'admin/patients/store';
+$route['admin/patients/edit/(:num)'] = 'admin/patients/edit/$1';
+$route['admin/patients/update/(:num)'] = 'admin/patients/update/$1';
+$route['admin/patients/change-status/(:num)'] = 'admin/patients/change_status/$1';
+
+/*
+|--------------------------------------------------------------------------
 | Admin Lab
 |--------------------------------------------------------------------------
 */

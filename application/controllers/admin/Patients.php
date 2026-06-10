@@ -53,6 +53,14 @@ class Patients extends MY_Controller
         }
 
         if ($this->validate_patient_form() === FALSE) {
+            if ($this->input->is_ajax_request()) {
+                return $this->json_response(array(
+                    'status' => FALSE,
+                    'message' => 'Please correct the highlighted errors.',
+                    'errors' => $this->validation_errors_array()
+                ), 422);
+            }
+
             $this->create();
             return;
         }
@@ -60,6 +68,13 @@ class Patients extends MY_Controller
         $patient_code = $this->Patient_model->generate_patient_code();
 
         if ($this->Patient_model->patient_code_exists($patient_code)) {
+            if ($this->input->is_ajax_request()) {
+                return $this->json_response(array(
+                    'status' => FALSE,
+                    'message' => 'Unable to generate a unique patient code. Please try again.'
+                ), 409);
+            }
+
             $this->session->set_flashdata('error', 'Unable to generate a unique patient code. Please try again.');
             redirect('admin/patients/create');
             return;
@@ -71,9 +86,24 @@ class Patients extends MY_Controller
         $created = $this->Patient_model->insert($data);
 
         if (!$created) {
+            if ($this->input->is_ajax_request()) {
+                return $this->json_response(array(
+                    'status' => FALSE,
+                    'message' => 'Unable to register patient at the moment.'
+                ), 500);
+            }
+
             $this->session->set_flashdata('error', 'Unable to register patient at the moment.');
             redirect('admin/patients/create');
             return;
+        }
+
+        if ($this->input->is_ajax_request()) {
+            return $this->json_response(array(
+                'status' => TRUE,
+                'message' => 'Patient registered successfully.',
+                'redirect' => site_url('admin/patients')
+            ));
         }
 
         $this->session->set_flashdata('success', 'Patient registered successfully.');
@@ -119,6 +149,14 @@ class Patients extends MY_Controller
         }
 
         if ($this->validate_patient_form() === FALSE) {
+            if ($this->input->is_ajax_request()) {
+                return $this->json_response(array(
+                    'status' => FALSE,
+                    'message' => 'Please correct the highlighted errors.',
+                    'errors' => $this->validation_errors_array()
+                ), 422);
+            }
+
             $this->edit((int) $id);
             return;
         }
@@ -126,9 +164,24 @@ class Patients extends MY_Controller
         $updated = $this->Patient_model->update((int) $id, $this->patient_form_data());
 
         if (!$updated) {
+            if ($this->input->is_ajax_request()) {
+                return $this->json_response(array(
+                    'status' => FALSE,
+                    'message' => 'Unable to update patient at the moment.'
+                ), 500);
+            }
+
             $this->session->set_flashdata('error', 'Unable to update patient at the moment.');
             redirect('admin/patients/edit/' . (int) $id);
             return;
+        }
+
+        if ($this->input->is_ajax_request()) {
+            return $this->json_response(array(
+                'status' => TRUE,
+                'message' => 'Patient updated successfully.',
+                'redirect' => site_url('admin/patients')
+            ));
         }
 
         $this->session->set_flashdata('success', 'Patient updated successfully.');
@@ -160,17 +213,20 @@ class Patients extends MY_Controller
         return $this->json_response(array(
             'status' => TRUE,
             'message' => $message,
-            'data' => $patient
+            'data' => $patient,
+            'row_html' => $this->render_patient_table(array($patient))
         ));
     }
 
     public function get_patients_ajax()
     {
         $search = trim((string) $this->input->get('search', TRUE));
+        $patients = $this->Patient_model->get_all($search);
 
         return $this->json_response(array(
             'status' => TRUE,
-            'data' => $this->Patient_model->get_all($search)
+            'data' => $patients,
+            'html' => $this->render_patient_table($patients)
         ));
     }
 
@@ -210,11 +266,34 @@ class Patients extends MY_Controller
         );
     }
 
+    protected function validation_errors_array()
+    {
+        $fields = array('full_name', 'gender', 'dob', 'blood_group', 'phone', 'email', 'address', 'emergency_contact', 'status');
+        $errors = array();
+
+        foreach ($fields as $field) {
+            $error = form_error($field, '', '');
+            if ($error !== '') {
+                $errors[$field] = $error;
+            }
+        }
+
+        return $errors;
+    }
+
+    protected function render_patient_table($patients)
+    {
+        return $this->load->view('admin/patients/_table', array(
+            'patients' => $patients
+        ), TRUE);
+    }
+
     protected function json_response($response, $status_code = 200)
     {
         $response['csrfHash'] = $this->security->get_csrf_hash();
 
         return $this->output
+            ->set_status_header($status_code)
             ->set_content_type('application/json')
             ->set_output(json_encode($response));
     }

@@ -19,6 +19,8 @@
 
     <section class="content">
         <div class="container-fluid">
+            <div id="hmsNotificationArea"></div>
+
             <?php if ($this->session->flashdata('error')): ?>
                 <div class="alert alert-danger alert-dismissible fade show" role="alert">
                     <?php echo html_escape($this->session->flashdata('error')); ?>
@@ -46,7 +48,7 @@
                     </div>
                 </div>
 
-                <?php echo form_open('admin/patients/update/' . (int) $patient['id'], array('autocomplete' => 'off')); ?>
+                <?php echo form_open('admin/patients/update/' . (int) $patient['id'], array('autocomplete' => 'off', 'class' => 'js-ajax-patient-form')); ?>
                     <div class="card-body">
                         <div class="alert alert-light border">
                             Patient Code:
@@ -160,3 +162,11 @@
         </div>
     </section>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    HMSAjax.bindAjaxForm('.js-ajax-patient-form', {
+        notificationTarget: '#hmsNotificationArea'
+    });
+});
+</script>
