@@ -25,6 +25,12 @@ $route['admin'] = 'admin/dashboard';
 $route['doctor'] = 'doctor/dashboard';
 $route['receptionist'] = 'receptionist/dashboard';
 $route['patient'] = 'patient/patient_dashboard';
+$route['patient/list'] = 'patient/patients/index';
+$route['patient/ajax/list'] = 'patient/patients/ajax_list';
+$route['patient/ajax/add'] = 'patient/patients/ajax_add';
+$route['patient/ajax/edit/(:num)'] = 'patient/patients/ajax_edit/$1';
+$route['patient/ajax/toggle/(:num)'] = 'patient/patients/ajax_toggle_status/$1';
+$route['patient/ajax/delete/(:num)'] = 'patient/patients/ajax_delete/$1';
 
 /*
 |--------------------------------------------------------------------------

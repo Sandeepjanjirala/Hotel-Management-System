@@ -31,6 +31,58 @@ class Patient_model extends CI_Model
             ->result_array();
     }
 
+    /**
+     * Paginated, filtered list for AJAX endpoints.
+     *
+     * @param  string   $search   Search keyword (Patient ID / Name / Phone / Email).
+     * @param  string   $status   '' or 'all' = all rows; '1' = active; '0' = inactive.
+     * @param  int      $limit    Rows per page.
+     * @param  int      $offset   Row offset.
+     * @return array    ['rows' => array, 'total' => int]
+     */
+    public function get_filtered($search = '', $status = 'all', $limit = 10, $offset = 0)
+    {
+        $select = 'id, patient_code, full_name, gender, dob, blood_group, phone, email, address, emergency_contact, status, created_at, updated_at';
+
+        // ── build shared WHERE clauses ──────────────────────────────
+        $this->db->from($this->table);
+
+        // Exclude soft-deleted rows (status = 2)
+        $this->db->where('status !=', 2);
+
+        if ($search !== '') {
+            $this->db
+                ->group_start()
+                ->like('patient_code', $search)
+                ->or_like('full_name',  $search)
+                ->or_like('phone',      $search)
+                ->or_like('email',      $search)
+                ->group_end();
+        }
+
+        if ($status !== '' && $status !== 'all') {
+            $this->db->where('status', (int) $status);
+        }
+
+        // ── total count ─────────────────────────────────────────────
+        $total = $this->db->count_all_results('', FALSE); // FALSE = keep QB state
+
+        // ── paginated rows ──────────────────────────────────────────
+        $rows = $this->db
+            ->select($select)
+            ->order_by('id', 'DESC')
+            ->limit((int) $limit, (int) $offset)
+            ->get()
+            ->result_array();
+
+        return array(
+            'rows'  => $rows,
+            'total' => (int) $total,
+        );
+    }
+
+
+
     public function get_by_id($id)
     {
         return $this->db
