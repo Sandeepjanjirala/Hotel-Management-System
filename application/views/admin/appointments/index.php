@@ -45,7 +45,7 @@
                         <i class="fas fa-calendar-check mr-1"></i> Appointment List
                     </h3>
                     <div class="card-tools">
-                        <a href="<?php echo site_url('admin/appointments/create'); ?>" class="btn btn-primary btn-sm">
+                        <a href="<?php echo site_url('admin/appointments/create'); ?>" class="btn btn-primary btn-sm js-create-appointment" id="btnOpenBook">
                             <i class="fas fa-plus mr-1"></i> Book Appointment
                         </a>
                     </div>
@@ -53,10 +53,23 @@
 
                 <div class="card-body">
                     <div class="row mb-3">
-                        <div class="col-lg-4 col-md-6 col-12 mb-2 mb-lg-0">
+                        <div class="col-lg-3 col-md-6 col-12 mb-2 mb-lg-0">
                             <input type="text" id="appointmentSearch" class="form-control" placeholder="Search code, patient, phone or doctor">
                         </div>
-                        <div class="col-lg-3 col-md-3 col-6 mb-2 mb-lg-0">
+                        <div class="col-lg-3 col-md-6 col-12 mb-2 mb-lg-0">
+                            <select id="doctorFilter" class="form-control">
+                                <option value="">All Doctors</option>
+                                <?php if (!empty($doctors)): ?>
+                                    <?php foreach ($doctors as $doctor): ?>
+                                        <?php $dept = !empty($doctor['department_name']) ? ' - ' . $doctor['department_name'] : ''; ?>
+                                        <option value="<?php echo (int) $doctor['id']; ?>">
+                                            <?php echo html_escape($doctor['name'] . $dept); ?>
+                                        </option>
+                                    <?php endforeach; ?>
+                                <?php endif; ?>
+                            </select>
+                        </div>
+                        <div class="col-lg-2 col-md-4 col-6 mb-2 mb-lg-0">
                             <select id="statusFilter" class="form-control">
                                 <option value="">All Status</option>
                                 <option value="scheduled">Scheduled</option>
@@ -64,10 +77,10 @@
                                 <option value="cancelled">Cancelled</option>
                             </select>
                         </div>
-                        <div class="col-lg-3 col-md-3 col-6 mb-2 mb-lg-0">
+                        <div class="col-lg-2 col-md-4 col-6 mb-2 mb-lg-0">
                             <input type="date" id="dateFilter" class="form-control">
                         </div>
-                        <div class="col-lg-2 col-12">
+                        <div class="col-lg-2 col-md-4 col-12">
                             <button type="button" id="clearFiltersButton" class="btn btn-default btn-block">
                                 <i class="fas fa-times mr-1"></i> Clear
                             </button>
@@ -94,171 +107,42 @@
                             </tbody>
                         </table>
                     </div>
+
+                    <!-- AJAX Pagination -->
+                    <div class="d-flex justify-content-between align-items-center mt-3 flex-wrap">
+                        <div id="paginationInfo" class="text-muted small mb-2 mb-md-0"></div>
+                        <div id="paginationLinks"></div>
+                    </div>
                 </div>
             </div>
         </div>
     </section>
 </div>
 
+<!-- Appointment Modal -->
+<div class="modal fade" id="appointmentModal" tabindex="-1" role="dialog" aria-labelledby="appointmentModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="appointmentModalLabel">Book Appointment</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body p-0" id="appointmentModalBody">
+                <!-- Loaded dynamically via AJAX -->
+            </div>
+        </div>
+    </div>
+</div>
+
 <script>
-document.addEventListener('DOMContentLoaded', function () {
-    var csrfName = '<?php echo $this->security->get_csrf_token_name(); ?>';
-    var csrfHash = '<?php echo $this->security->get_csrf_hash(); ?>';
-    var listUrl = '<?php echo site_url('admin/appointments/ajax-list'); ?>';
-    var editBaseUrl = '<?php echo site_url('admin/appointments/edit'); ?>';
-    var changeStatusBaseUrl = '<?php echo site_url('admin/appointments/change-status'); ?>';
-    var searchTimer = null;
-
-    function updateCsrfToken(hash) {
-        if (hash) {
-            csrfHash = hash;
-        }
-    }
-
-    function escapeHtml(value) {
-        return $('<div>').text(value === null || value === undefined ? '' : value).html();
-    }
-
-    function showAlert(type, message) {
-        var alertClass = type === 'success' ? 'success' : 'danger';
-        var html = ''
-            + '<div class="alert alert-' + alertClass + ' alert-dismissible fade show" role="alert">'
-            + escapeHtml(message)
-            + '<button type="button" class="close" data-dismiss="alert" aria-label="Close">'
-            + '<span aria-hidden="true">&times;</span>'
-            + '</button>'
-            + '</div>';
-
-        $('#appointmentAlert').html(html);
-    }
-
-    function statusBadge(status) {
-        if (status === 'completed') {
-            return '<span class="badge badge-success">Completed</span>';
-        }
-
-        if (status === 'cancelled') {
-            return '<span class="badge badge-danger">Cancelled</span>';
-        }
-
-        return '<span class="badge badge-primary">Scheduled</span>';
-    }
-
-    function renderRows(rows) {
-        var html = '';
-
-        if (!rows || rows.length === 0) {
-            $('#appointmentsTableBody').html('<tr><td colspan="7" class="text-center">No appointments found.</td></tr>');
-            return;
-        }
-
-        $.each(rows, function (index, appointment) {
-            var department = appointment.department_name ? ' - ' + escapeHtml(appointment.department_name) : '';
-
-            html += '<tr>';
-            html += '<td><strong>' + escapeHtml(appointment.appointment_code) + '</strong></td>';
-            html += '<td>' + escapeHtml(appointment.patient_name) + '<br><small class="text-muted">' + escapeHtml(appointment.patient_code) + '</small></td>';
-            html += '<td>' + escapeHtml(appointment.doctor_name) + '<br><small class="text-muted">' + department + '</small></td>';
-            html += '<td>' + escapeHtml(appointment.appointment_date) + '</td>';
-            html += '<td>' + escapeHtml(appointment.appointment_time) + '</td>';
-            html += '<td>' + statusBadge(appointment.status) + '</td>';
-            html += '<td>';
-            html += '<a href="' + editBaseUrl + '/' + escapeHtml(appointment.id) + '" class="btn btn-info btn-sm mr-1">';
-            html += '<i class="fas fa-edit mr-1"></i>Edit';
-            html += '</a>';
-            html += '<select class="form-control form-control-sm d-inline-block appointment-status-select" data-id="' + escapeHtml(appointment.id) + '" style="width: 125px;">';
-            html += '<option value="scheduled" ' + (appointment.status === 'scheduled' ? 'selected' : '') + '>Scheduled</option>';
-            html += '<option value="completed" ' + (appointment.status === 'completed' ? 'selected' : '') + '>Completed</option>';
-            html += '<option value="cancelled" ' + (appointment.status === 'cancelled' ? 'selected' : '') + '>Cancelled</option>';
-            html += '</select>';
-            html += '</td>';
-            html += '</tr>';
-        });
-
-        $('#appointmentsTableBody').html(html);
-    }
-
-    function loadAppointments() {
-        $('#appointmentsTableBody').html('<tr><td colspan="7" class="text-center">Loading appointments...</td></tr>');
-
-        $.ajax({
-            url: listUrl,
-            type: 'GET',
-            dataType: 'json',
-            data: {
-                search: $('#appointmentSearch').val(),
-                status: $('#statusFilter').val(),
-                appointment_date: $('#dateFilter').val()
-            },
-            success: function (response) {
-                updateCsrfToken(response.csrfHash);
-
-                if (response.status) {
-                    renderRows(response.data);
-                    return;
-                }
-
-                renderRows([]);
-                showAlert('danger', response.message || 'Unable to load appointments.');
-            },
-            error: function () {
-                renderRows([]);
-                showAlert('danger', 'Unable to load appointments.');
-            }
-        });
-    }
-
-    $('#appointmentSearch').on('keyup', function () {
-        window.clearTimeout(searchTimer);
-
-        searchTimer = window.setTimeout(function () {
-            loadAppointments();
-        }, 300);
-    });
-
-    $('#statusFilter, #dateFilter').on('change', function () {
-        loadAppointments();
-    });
-
-    $('#clearFiltersButton').on('click', function () {
-        $('#appointmentSearch').val('');
-        $('#statusFilter').val('');
-        $('#dateFilter').val('');
-        loadAppointments();
-    });
-
-    $(document).on('change', '.appointment-status-select', function () {
-        var appointmentId = $(this).data('id');
-        var newStatus = $(this).val();
-        var payload = {};
-
-        payload[csrfName] = csrfHash;
-        payload.status = newStatus;
-
-        $.ajax({
-            url: changeStatusBaseUrl + '/' + appointmentId,
-            type: 'POST',
-            dataType: 'json',
-            data: payload,
-            success: function (response) {
-                updateCsrfToken(response.csrfHash);
-
-                if (response.status) {
-                    loadAppointments();
-                    showAlert('success', response.message);
-                    return;
-                }
-
-                loadAppointments();
-                showAlert('danger', response.message || 'Unable to update appointment status.');
-            },
-            error: function () {
-                loadAppointments();
-                showAlert('danger', 'Unable to update appointment status.');
-            }
-        });
-    });
-
-    loadAppointments();
-});
+    window.HMS_APPOINTMENT_CONFIG = {
+        listUrl: '<?php echo site_url('admin/appointments/ajax-list'); ?>',
+        createUrl: '<?php echo site_url('admin/appointments/create'); ?>',
+        editUrl: '<?php echo site_url('admin/appointments/edit'); ?>',
+        changeStatusUrl: '<?php echo site_url('admin/appointments/change-status'); ?>'
+    };
 </script>
+<script src="<?php echo base_url('assets/js/modules/appointments.js'); ?>"></script>
+

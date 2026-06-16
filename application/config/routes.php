@@ -48,6 +48,20 @@ $route['admin/patients/change-status/(:num)'] = 'admin/patients/change_status/$1
 
 /*
 |--------------------------------------------------------------------------
+| Admin Appointments
+|--------------------------------------------------------------------------
+*/
+$route['admin/appointments'] = 'admin/appointments';
+$route['admin/appointments/ajax-list'] = 'admin/appointments/get_appointments_ajax';
+$route['admin/appointments/create'] = 'admin/appointments/create';
+$route['admin/appointments/store'] = 'admin/appointments/store';
+$route['admin/appointments/edit/(:num)'] = 'admin/appointments/edit/$1';
+$route['admin/appointments/update/(:num)'] = 'admin/appointments/update/$1';
+$route['admin/appointments/change-status/(:num)'] = 'admin/appointments/change_status/$1';
+
+
+/*
+|--------------------------------------------------------------------------
 | Admin Lab
 |--------------------------------------------------------------------------
 */

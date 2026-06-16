@@ -124,6 +124,59 @@ class Appointment_model extends CI_Model
             ));
     }
 
+    public function get_filtered($filters = array(), $limit = 10, $offset = 0)
+    {
+        $this->db
+            ->select('a.id, a.appointment_code, a.patient_id, a.doctor_id, a.appointment_date, a.appointment_time, a.reason, a.notes, a.status, a.created_at')
+            ->select('p.patient_code, p.full_name AS patient_name, p.phone AS patient_phone')
+            ->select('u.name AS doctor_name, u.email AS doctor_email')
+            ->select('d.department_name')
+            ->from($this->table . ' a')
+            ->join('patients p', 'p.id = a.patient_id', 'inner')
+            ->join('users u', 'u.id = a.doctor_id', 'inner')
+            ->join('departments d', 'd.id = u.department_id', 'left');
+
+        if (!empty($filters['search'])) {
+            $search = $filters['search'];
+
+            $this->db
+                ->group_start()
+                ->like('a.appointment_code', $search)
+                ->or_like('p.patient_code', $search)
+                ->or_like('p.full_name', $search)
+                ->or_like('p.phone', $search)
+                ->or_like('u.name', $search)
+                ->group_end();
+        }
+
+        if (!empty($filters['status'])) {
+            $this->db->where('a.status', $filters['status']);
+        }
+
+        if (!empty($filters['appointment_date'])) {
+            $this->db->where('a.appointment_date', $filters['appointment_date']);
+        }
+
+        if (!empty($filters['doctor_id'])) {
+            $this->db->where('a.doctor_id', (int) $filters['doctor_id']);
+        }
+
+        // Count total results matching the filters (FALSE keeps query builder query active)
+        $total = $this->db->count_all_results('', FALSE);
+
+        $rows = $this->db
+            ->order_by('a.appointment_date', 'DESC')
+            ->order_by('a.appointment_time', 'DESC')
+            ->limit((int) $limit, (int) $offset)
+            ->get()
+            ->result_array();
+
+        return array(
+            'rows' => $rows,
+            'total' => (int) $total
+        );
+    }
+
     public function generate_appointment_code()
     {
         $year = date('Y');
