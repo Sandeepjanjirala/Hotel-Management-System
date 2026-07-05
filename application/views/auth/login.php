@@ -52,6 +52,21 @@
         .validation-block p {
             margin-bottom: 0.35rem;
         }
+        
+        .error-message {
+            color: #dc3545;
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
+        }
+        
+        .is-invalid {
+            border-color: #dc3545;
+        }
+        
+        .is-invalid:focus {
+            border-color: #dc3545;
+            box-shadow: 0 0 0 0.25rem rgba(220, 53, 69, 0.25);
+        }
     </style>
 </head>
 <body>
@@ -85,6 +100,11 @@
                         </div>
                     <?php endif; ?>
 
+                    <!-- Login Error Display Area -->
+                    <div id="loginError" class="alert alert-danger" style="display: none;" role="alert">
+                        <span id="errorMessage"></span>
+                    </div>
+
                     <?php echo form_open('auth/login', array('id' => 'loginForm', 'autocomplete' => 'off', 'novalidate' => 'novalidate')); ?>
                         <div class="mb-3">
                             <label for="email" class="form-label">Email Address</label>
@@ -97,6 +117,7 @@
                                 placeholder="Enter your email"
                                 required
                             >
+                            <div id="emailError" class="error-message"></div>
                         </div>
 
                         <div class="mb-4">
@@ -109,6 +130,7 @@
                                 placeholder="Enter your password"
                                 required
                             >
+                            <div id="passwordError" class="error-message"></div>
                         </div>
 
                         <div class="d-grid">
@@ -134,13 +156,199 @@
     crossorigin="anonymous"
 ></script>
 <script>
-    $(function () {
-        $('#loginForm').on('submit', function () {
-            $('#loginButton')
-                .prop('disabled', true)
-                .text('Signing in...');
+$(function () {
+    // Pre-fill email from session flash data if available
+    var flashEmail = '<?php echo $this->session->flashdata('email'); ?>';
+    if (flashEmail) {
+        $('#email').val(flashEmail);
+    }
+    
+    // Real-time validation on email input
+    $('#email').on('input', function() {
+        var email = $(this).val().trim();
+        var emailError = $('#emailError');
+        var emailField = $(this);
+        
+        if (email === '') {
+            emailError.text('Email is required.');
+            emailField.addClass('is-invalid');
+        } else if (!isValidEmail(email)) {
+            emailError.text('Please enter a valid email address.');
+            emailField.addClass('is-invalid');
+        } else {
+            emailError.text('');
+            emailField.removeClass('is-invalid');
+        }
+    });
+    
+    // Real-time validation on password input
+    $('#password').on('input', function() {
+        var password = $(this).val();
+        var passwordError = $('#passwordError');
+        var passwordField = $(this);
+        
+        if (password === '') {
+            passwordError.text('Password is required.');
+            passwordField.addClass('is-invalid');
+        } else if (password.length < 6) {
+            passwordError.text('Password must be at least 6 characters long.');
+            passwordField.addClass('is-invalid');
+        } else {
+            passwordError.text('');
+            passwordField.removeClass('is-invalid');
+        }
+    });
+    
+    $('#loginForm').on('submit', function(e) {
+        // Prevent multiple submissions
+        var loginButton = $('#loginButton');
+        if (loginButton.prop('disabled')) {
+            e.preventDefault();
+            return false;
+        }
+        
+        // Clear previous errors
+        $('#loginError').hide();
+        $('#emailError').text('');
+        $('#email').removeClass('is-invalid');
+        $('#passwordError').text('');
+        $('#password').removeClass('is-invalid');
+        
+        var email = $('#email').val().trim();
+        var password = $('#password').val();
+        var isValid = true;
+        var errorMessages = [];
+        
+        // Validate email
+        if (email === '') {
+            $('#emailError').text('Email is required.');
+            $('#email').addClass('is-invalid');
+            isValid = false;
+            errorMessages.push('Email is required.');
+        } else if (!isValidEmail(email)) {
+            $('#emailError').text('Please enter a valid email address.');
+            $('#email').addClass('is-invalid');
+            isValid = false;
+            errorMessages.push('Please enter a valid email address.');
+        }
+        
+        // Validate password
+        if (password === '') {
+            $('#passwordError').text('Password is required.');
+            $('#password').addClass('is-invalid');
+            isValid = false;
+            errorMessages.push('Password is required.');
+        } else if (password.length < 6) {
+            $('#passwordError').text('Password must be at least 6 characters long.');
+            $('#password').addClass('is-invalid');
+            isValid = false;
+            errorMessages.push('Password must be at least 6 characters long.');
+        }
+        
+        if (!isValid) {
+            e.preventDefault();
+            showError(errorMessages.join(' '));
+            return false;
+        }
+        
+        // Disable button and show loading state
+        loginButton
+            .prop('disabled', true)
+            .text('Signing in...');
+    });
+    
+    // Helper function to validate email format
+    function isValidEmail(email) {
+        var emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+        return emailRegex.test(email);
+    }
+    
+    // Helper function to show error messages
+    function showError(message) {
+        $('#errorMessage').text(message);
+        $('#loginError').show();
+        
+        // Auto-hide error after 5 seconds if it's a server error
+        setTimeout(function() {
+            $('#loginError').fadeOut('slow');
+        }, 5000);
+    }
+    
+    // Handle server-side validation errors from PHP
+    <?php if ($this->session->flashdata('error')): ?>
+        var errorMessage = '<?php echo addslashes($this->session->flashdata('error')); ?>';
+        if (errorMessage.toLowerCase().includes('password')) {
+            $('#passwordError').text(errorMessage);
+            $('#password').addClass('is-invalid');
+        } else if (errorMessage.toLowerCase().includes('user')) {
+            $('#emailError').text(errorMessage);
+            $('#email').addClass('is-invalid');
+        } else {
+            showError(errorMessage);
+        }
+        // Re-enable button if there was an error
+        $('#loginButton').prop('disabled', false).text('Login');
+    <?php endif; ?>
+    
+    // Reset button state when form is reset
+    $(document).ajaxStart(function() {
+        // Any AJAX start events
+    }).ajaxComplete(function() {
+        // Any AJAX complete events
+    });
+    
+    // Handle form reset (if needed)
+    $('input').on('keydown', function(e) {
+        if (e.key === 'Escape') {
+            $(this).val('');
+            $(this).removeClass('is-invalid');
+            $(this).siblings('.error-message').text('');
+            $('#loginError').hide();
+        }
+    });
+});
+
+// Alternative: Use AJAX for login without page refresh
+/*
+$(function() {
+    $('#loginForm').on('submit', function(e) {
+        e.preventDefault();
+        
+        var loginButton = $('#loginButton');
+        var formData = $(this).serialize();
+        
+        loginButton.prop('disabled', true).text('Signing in...');
+        $('#loginError').hide();
+        
+        $.ajax({
+            url: '<?php echo base_url('auth/login'); ?>',
+            type: 'POST',
+            data: formData,
+            dataType: 'json',
+            success: function(response) {
+                if (response.status === 'success') {
+                    window.location.href = response.redirect;
+                } else {
+                    if (response.error.toLowerCase().includes('password')) {
+                        $('#passwordError').text(response.error);
+                        $('#password').addClass('is-invalid');
+                    } else if (response.error.toLowerCase().includes('user')) {
+                        $('#emailError').text(response.error);
+                        $('#email').addClass('is-invalid');
+                    } else {
+                        showError(response.error);
+                    }
+                    loginButton.prop('disabled', false).text('Login');
+                }
+            },
+            error: function() {
+                showError('An error occurred. Please try again.');
+                loginButton.prop('disabled', false).text('Login');
+            }
         });
     });
+});
+*/
 </script>
 </body>
 </html>

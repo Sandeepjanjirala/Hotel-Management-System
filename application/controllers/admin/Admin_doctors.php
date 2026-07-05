@@ -1,6 +1,7 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
 
+
 class Admin_doctors extends MY_Controller
 {
     public function __construct()
@@ -8,7 +9,7 @@ class Admin_doctors extends MY_Controller
         parent::__construct();
 
         $this->require_role(array('admin'));
-        $this->load->model('Doctor_model');
+        $this->load->model('Doctor_model'); // Make sure this model exists
         $this->form_validation->set_error_delimiters('', '');
     }
 
@@ -24,7 +25,7 @@ class Admin_doctors extends MY_Controller
         $this->load->view('admin/layouts/header', $data);
         $this->load->view('admin/layouts/navbar', $data);
         $this->load->view('admin/layouts/sidebar', $data);
-        $this->load->view('admin/doctors/index', $data);
+        $this->load->view('admin/doctors/index', $data); // This should be the doctor view
         $this->load->view('admin/layouts/footer', $data);
     }
 
@@ -32,7 +33,7 @@ class Admin_doctors extends MY_Controller
     {
         return $this->json_response(array(
             'status' => TRUE,
-            'data' => $this->Doctor_model->get_all()
+            'data' => $this->Admin_doctor_model->get_all()
         ));
     }
 

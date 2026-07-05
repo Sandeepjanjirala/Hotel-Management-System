@@ -15,7 +15,7 @@ class Department_model extends CI_Model
         return $this->db
             ->select('id, department_name, description, status, created_at, updated_at')
             ->from($this->table)
-            ->order_by('id', 'DESC')
+            ->order_by('id', 'ASC')
             ->get()
             ->result_array();
     }
