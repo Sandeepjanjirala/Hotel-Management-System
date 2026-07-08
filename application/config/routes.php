@@ -132,9 +132,11 @@ $route['admin/prescriptions'] = 'admin/admin_prescriptions/index';
 $route['admin/prescriptions/ajax-list'] = 'admin/admin_prescriptions/get_prescriptions_ajax';
 $route['admin/prescriptions/create'] = 'admin/admin_prescriptions/create';
 $route['admin/prescriptions/store'] = 'admin/admin_prescriptions/store';
+
+
 /*
 |--------------------------------------------------------------------------
-| Admin Pharmacy Billing
+| Admin Pharmacy Billing (FIXED)
 |--------------------------------------------------------------------------
 */
 $route['admin/pharmacy-billing'] = 'admin/admin_pharmacy/index';
@@ -143,6 +145,8 @@ $route['admin/pharmacy-billing/create'] = 'admin/admin_pharmacy/create';
 $route['admin/pharmacy-billing/create/(:num)'] = 'admin/admin_pharmacy/create/$1';
 $route['admin/pharmacy-billing/prescription/(:num)'] = 'admin/admin_pharmacy/get_prescription_ajax/$1';
 $route['admin/pharmacy-billing/store'] = 'admin/admin_pharmacy/store';
+
+
 /*
 |--------------------------------------------------------------------------
 | Billing

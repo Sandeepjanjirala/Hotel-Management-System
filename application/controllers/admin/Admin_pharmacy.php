@@ -54,33 +54,48 @@ class Admin_pharmacy extends MY_Controller
             'bill_date' => trim((string) $this->input->get('bill_date', TRUE))
         );
 
+        $bills = $this->Pharmacy_bill_model->get_all($filters);
+
         return $this->json_response(array(
             'status' => TRUE,
-            'data' => $this->Pharmacy_bill_model->get_all($filters)
+            'data' => $bills
         ));
     }
 
     // FIXED: Method name matches route
     public function get_prescription_ajax($id)
     {
+        // Debug logging
+        log_message('debug', 'Getting prescription details for ID: ' . $id);
+        
         $prescription = $this->Pharmacy_bill_model->get_prescription_details((int) $id);
 
         if (empty($prescription)) {
+            log_message('debug', 'Prescription not found or already billed for ID: ' . $id);
             return $this->json_response(array(
                 'status' => FALSE,
                 'message' => 'Prescription not found or already billed.'
             ));
         }
 
+        $items = $this->Pharmacy_bill_model->get_prescription_items_for_billing((int) $id);
+        
+        log_message('debug', 'Found ' . count($items) . ' items for prescription ID: ' . $id);
+
         return $this->json_response(array(
             'status' => TRUE,
             'prescription' => $prescription,
-            'items' => $this->Pharmacy_bill_model->get_prescription_items_for_billing((int) $id)
+            'items' => $items
         ));
     }
 
     public function store()
     {
+        // Debug: Log the request
+        log_message('debug', '=== PHARMACY BILL STORE ===');
+        log_message('debug', 'Request method: ' . $this->input->method());
+        log_message('debug', 'POST data: ' . print_r($this->input->post(NULL, TRUE), true));
+
         if ($this->input->method() !== 'post') {
             return $this->json_response(array(
                 'status' => FALSE,
@@ -88,51 +103,7 @@ class Admin_pharmacy extends MY_Controller
             ));
         }
 
-        $prescription = NULL;
-        $items = array();
-        $total_amount = 0.00;
-
-        if ($this->validate_bill_form($prescription, $items, $total_amount) === FALSE) {
-            return;
-        }
-
-        $bill_code = $this->Pharmacy_bill_model->generate_bill_code();
-
-        if ($this->Pharmacy_bill_model->bill_code_exists($bill_code)) {
-            return $this->json_response(array(
-                'status' => FALSE,
-                'message' => 'Unable to generate a unique bill code. Please try again.'
-            ));
-        }
-
-        $bill_data = array(
-            'bill_code' => $bill_code,
-            'prescription_id' => (int) $prescription['id'],
-            'patient_id' => (int) $prescription['patient_id'],
-            'doctor_id' => (int) $prescription['doctor_id'],
-            'bill_date' => trim((string) $this->input->post('bill_date', TRUE)),
-            'total_amount' => number_format((float) $total_amount, 2, '.', ''),
-            'generated_by' => $this->current_user_id()
-        );
-
-        $created = $this->Pharmacy_bill_model->create_bill($bill_data, $items);
-
-        if (!$created) {
-            return $this->json_response(array(
-                'status' => FALSE,
-                'message' => 'Unable to save bill. Please verify stock availability and try again.'
-            ));
-        }
-
-        return $this->json_response(array(
-            'status' => TRUE,
-            'message' => 'Pharmacy bill saved successfully and medicine stock has been deducted.',
-            'redirectUrl' => site_url('admin/pharmacy-billing')
-        ));
-    }
-
-    protected function validate_bill_form(&$prescription, &$validated_items, &$total_amount)
-    {
+        // Validate the form
         $this->form_validation->set_rules('prescription_id', 'Prescription', 'trim|required|integer');
         $this->form_validation->set_rules('bill_date', 'Bill Date', 'trim|required');
 
@@ -144,7 +115,9 @@ class Admin_pharmacy extends MY_Controller
         }
 
         $prescription_id = (int) $this->input->post('prescription_id', TRUE);
+        $bill_date = trim((string) $this->input->post('bill_date', TRUE));
 
+        // Check if prescription already has a bill
         if ($this->Pharmacy_bill_model->prescription_has_bill($prescription_id)) {
             return $this->json_response(array(
                 'status' => FALSE,
@@ -152,6 +125,7 @@ class Admin_pharmacy extends MY_Controller
             ));
         }
 
+        // Get prescription details
         $prescription = $this->Pharmacy_bill_model->get_prescription_details($prescription_id);
 
         if (empty($prescription)) {
@@ -161,7 +135,10 @@ class Admin_pharmacy extends MY_Controller
             ));
         }
 
+        // Get items from POST
         $posted_items = $this->input->post('items', TRUE);
+        
+        log_message('debug', 'Posted items: ' . print_r($posted_items, true));
 
         if (empty($posted_items) || !is_array($posted_items)) {
             return $this->json_response(array(
@@ -170,8 +147,11 @@ class Admin_pharmacy extends MY_Controller
             ));
         }
 
+        // Process items
         $prescription_items = $this->Pharmacy_bill_model->get_prescription_items_for_billing($prescription_id);
         $prescription_item_map = array();
+        $validated_items = array();
+        $total_amount = 0.00;
         $medicine_stock_usage = array();
 
         foreach ($prescription_items as $item) {
@@ -208,7 +188,7 @@ class Admin_pharmacy extends MY_Controller
             if ($medicine_stock_usage[$medicine_id] > (int) $source_item['stock_quantity']) {
                 return $this->json_response(array(
                     'status' => FALSE,
-                    'message' => 'Requested quantity exceeds available stock for ' . $source_item['medicine_name'] . '.'
+                    'message' => 'Requested quantity exceeds available stock for ' . $source_item['medicine_name'] . '. Available: ' . $source_item['stock_quantity']
                 ));
             }
 
@@ -233,7 +213,45 @@ class Admin_pharmacy extends MY_Controller
             ));
         }
 
-        return TRUE;
+        // Generate bill code
+        $bill_code = $this->Pharmacy_bill_model->generate_bill_code();
+
+        if ($this->Pharmacy_bill_model->bill_code_exists($bill_code)) {
+            return $this->json_response(array(
+                'status' => FALSE,
+                'message' => 'Unable to generate a unique bill code. Please try again.'
+            ));
+        }
+
+        // Prepare bill data
+        $bill_data = array(
+            'bill_code' => $bill_code,
+            'prescription_id' => (int) $prescription['id'],
+            'patient_id' => (int) $prescription['patient_id'],
+            'doctor_id' => (int) $prescription['doctor_id'],
+            'bill_date' => $bill_date,
+            'total_amount' => number_format((float) $total_amount, 2, '.', ''),
+            'generated_by' => $this->current_user_id()
+        );
+
+        log_message('debug', 'Bill data: ' . print_r($bill_data, true));
+        log_message('debug', 'Items: ' . print_r($validated_items, true));
+
+        // Create the bill
+        $created = $this->Pharmacy_bill_model->create_bill($bill_data, $validated_items);
+
+        if (!$created) {
+            return $this->json_response(array(
+                'status' => FALSE,
+                'message' => 'Unable to save bill. Please verify stock availability and try again.'
+            ));
+        }
+
+        return $this->json_response(array(
+            'status' => TRUE,
+            'message' => 'Pharmacy bill saved successfully and medicine stock has been deducted.',
+            'redirectUrl' => site_url('admin/pharmacy-billing')
+        ));
     }
 
     // protected function json_response($response)

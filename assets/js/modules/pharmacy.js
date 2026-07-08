@@ -24,6 +24,7 @@ var PharmacyModule = (function() {
        ═══════════════════════════════════════════════════════════════ */
     function initCreate(options) {
         config = options || {};
+        console.log('PharmacyModule initialized with config:', config);
         bindCreateEvents();
 
         // Load prescription if preselected
@@ -60,15 +61,23 @@ var PharmacyModule = (function() {
        ═══════════════════════════════════════════════════════════════ */
     function bindCreateEvents() {
         $('#prescription_id').on('change', function() {
-            loadPrescription($(this).val());
+            var val = $(this).val();
+            console.log('Prescription selected:', val);
+            if (val) {
+                loadPrescription(val);
+            } else {
+                resetBillingForm();
+            }
         });
 
+        // Use event delegation for dynamically created elements
         $(document).on('input', '.bill-quantity', function() {
             calculateTotal();
         });
 
         $('#pharmacyBillForm').on('submit', function(e) {
             e.preventDefault();
+            console.log('Form submitted');
             saveBill();
         });
     }
@@ -88,6 +97,7 @@ var PharmacyModule = (function() {
                 bill_date: $('#billDateFilter').val()
             },
             success: function(response) {
+                console.log('Bills response:', response);
                 updateCsrfToken(response.csrfHash);
 
                 if (response.status) {
@@ -98,9 +108,10 @@ var PharmacyModule = (function() {
                 renderBillRows([]);
                 showAlert('danger', response.message || 'Unable to load pharmacy bills.', '#pharmacyBillAlert');
             },
-            error: function() {
+            error: function(xhr, status, error) {
+                console.error('Error loading bills:', error);
                 renderBillRows([]);
-                showAlert('danger', 'Unable to load pharmacy bills.', '#pharmacyBillAlert');
+                showAlert('danger', 'Unable to load pharmacy bills. Please check console for details.', '#pharmacyBillAlert');
             }
         });
     }
@@ -136,6 +147,7 @@ var PharmacyModule = (function() {
        LOAD PRESCRIPTION
        ═══════════════════════════════════════════════════════════════ */
     function loadPrescription(prescriptionId) {
+        console.log('Loading prescription:', prescriptionId);
         resetBillingForm();
 
         if (!prescriptionId) {
@@ -144,11 +156,15 @@ var PharmacyModule = (function() {
 
         $('#billItemsTableBody').html('<tr><td colspan="8" class="text-center">Loading prescription medicines...</td></tr>');
 
+        var url = config.prescriptionUrl + '/' + prescriptionId;
+        console.log('AJAX URL:', url);
+
         $.ajax({
-            url: config.prescriptionUrl + '/' + prescriptionId,
+            url: url,
             type: 'GET',
             dataType: 'json',
             success: function(response) {
+                console.log('Prescription response:', response);
                 updateCsrfToken(response.csrfHash);
 
                 if (response.status) {
@@ -320,12 +336,16 @@ var PharmacyModule = (function() {
         // Clear any previous alerts
         clearAlert('#billingAlert');
 
+        var formData = $('#pharmacyBillForm').serialize();
+        console.log('Form data being sent:', formData);
+
         $.ajax({
             url: config.storeUrl,
             type: 'POST',
             dataType: 'json',
-            data: $('#pharmacyBillForm').serialize(),
+            data: formData,
             success: function(response) {
+                console.log('Save response:', response);
                 updateCsrfToken(response.csrfHash);
 
                 if (response.status) {
@@ -335,7 +355,7 @@ var PharmacyModule = (function() {
                         if (response.redirectUrl) {
                             window.location.href = response.redirectUrl;
                         }
-                    }, 1000);
+                    }, 1500);
 
                     return;
                 }
@@ -343,13 +363,18 @@ var PharmacyModule = (function() {
                 showAlert('danger', response.message || 'Unable to save pharmacy bill.', '#billingAlert');
                 $button.prop('disabled', false).html(originalText);
             },
-            error: function(xhr) {
+            error: function(xhr, status, error) {
+                console.error('Save error:', status, error);
+                console.error('Response text:', xhr.responseText);
+                
                 var response = {};
                 try {
                     response = JSON.parse(xhr.responseText);
-                } catch (err) {}
+                } catch (err) {
+                    response.message = 'An unexpected error occurred. Please try again.';
+                }
 
-                showAlert('danger', response.message || 'Unable to save pharmacy bill.', '#billingAlert');
+                showAlert('danger', response.message || 'Unable to save pharmacy bill. Please check console for details.', '#billingAlert');
                 $button.prop('disabled', false).html(originalText);
             }
         });

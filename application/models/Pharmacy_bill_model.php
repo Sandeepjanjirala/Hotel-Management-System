@@ -52,23 +52,23 @@ class Pharmacy_bill_model extends CI_Model
             ->result_array();
     }
 
-    public function get_unbilled_prescriptions()
-    {
-        return $this->db
-            ->select('pr.id, pr.prescription_date, pr.diagnosis')
-            ->select('a.appointment_code, a.appointment_date, a.appointment_time')
-            ->select('p.patient_code, p.full_name AS patient_name, p.phone AS patient_phone')
-            ->select('u.name AS doctor_name')
-            ->from('prescriptions pr')
-            ->join('appointments a', 'a.id = pr.appointment_id', 'inner')
-            ->join('patients p', 'p.id = pr.patient_id', 'inner')
-            ->join('users u', 'u.id = pr.doctor_id', 'inner')
-            ->join($this->bills_table . ' pb', 'pb.prescription_id = pr.id', 'left')
-            ->where('pb.id IS NULL', NULL, FALSE)
-            ->order_by('pr.id', 'DESC')
-            ->get()
-            ->result_array();
-    }
+public function get_unbilled_prescriptions()
+{
+    $this->db
+        ->select('pr.id, pr.prescription_date, pr.diagnosis')
+        ->select('a.appointment_code, a.appointment_date, a.appointment_time')
+        ->select('p.patient_code, p.full_name AS patient_name, p.phone AS patient_phone')
+        ->select('u.name AS doctor_name')
+        ->from('prescriptions pr')
+        ->join('appointments a', 'a.id = pr.appointment_id', 'inner')
+        ->join('patients p', 'p.id = pr.patient_id', 'inner')
+        ->join('users u', 'u.id = pr.doctor_id', 'inner')
+        ->join($this->bills_table . ' pb', 'pb.prescription_id = pr.id', 'left')
+        ->where('pb.id IS NULL', NULL, FALSE)
+        ->order_by('pr.id', 'DESC');
+
+    return $this->db->get()->result_array();
+}
 
     public function get_prescription_details($prescription_id)
     {
