@@ -188,35 +188,39 @@ class Patients extends MY_Controller
         redirect('admin/patients');
     }
 
-    public function change_status($id)
-    {
-        if ($this->input->method() !== 'post') {
-            return $this->json_response(array(
-                'status' => FALSE,
-                'message' => 'Invalid request method.'
-            ));
-        }
-
-        $patient = $this->Patient_model->toggle_status((int) $id);
-
-        if (!$patient) {
-            return $this->json_response(array(
-                'status' => FALSE,
-                'message' => 'Unable to change patient status.'
-            ));
-        }
-
-        $message = ((int) $patient['status'] === 1)
-            ? 'Patient activated successfully.'
-            : 'Patient deactivated successfully.';
-
+    public function change_status($id){
+    if ($this->input->method() !== 'post') {
         return $this->json_response(array(
-            'status' => TRUE,
-            'message' => $message,
-            'data' => $patient,
-            'row_html' => $this->render_patient_table(array($patient))
+            'status' => FALSE,
+            'message' => 'Invalid request method.'
         ));
     }
+
+    $patient = $this->Patient_model->toggle_status((int) $id);
+
+    if (!$patient) {
+        return $this->json_response(array(
+            'status' => FALSE,
+            'message' => 'Unable to change patient status.'
+        ));
+    }
+
+    $message = ((int) $patient['status'] === 1)
+        ? 'Patient activated successfully.'
+        : 'Patient deactivated successfully.';
+
+    // Generate the row HTML for the updated patient
+    $row_html = $this->load->view('admin/patients/_table', array(
+        'patients' => array($patient)
+    ), TRUE);
+
+    return $this->json_response(array(
+        'status' => TRUE,
+        'message' => $message,
+        'data' => $patient,
+        'row_html' => $row_html
+    ));
+}
 
     public function get_patients_ajax()
     {

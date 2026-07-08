@@ -78,6 +78,7 @@
     </section>
 </div>
 
+<!-- Add Medicine Modal -->
 <div class="modal fade" id="addMedicineModal" tabindex="-1" role="dialog" aria-labelledby="addMedicineModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
@@ -167,6 +168,7 @@
     </div>
 </div>
 
+<!-- Edit Medicine Modal -->
 <div class="modal fade" id="editMedicineModal" tabindex="-1" role="dialog" aria-labelledby="editMedicineModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
@@ -257,332 +259,20 @@
     </div>
 </div>
 
+<!-- Include Medicine Module Script -->
+<script src="<?php echo base_url('assets/js/modules/medicines.js'); ?>"></script>
+
 <script>
 document.addEventListener('DOMContentLoaded', function () {
-    var csrfName = '<?php echo $this->security->get_csrf_token_name(); ?>';
-    var csrfHash = '<?php echo $this->security->get_csrf_hash(); ?>';
-
-    var listUrl = '<?php echo site_url('admin/medicines/ajax-list'); ?>';
-    var storeUrl = '<?php echo site_url('admin/medicines/store'); ?>';
-    var editBaseUrl = '<?php echo site_url('admin/medicines/edit'); ?>';
-    var updateBaseUrl = '<?php echo site_url('admin/medicines/update'); ?>';
-    var changeStatusBaseUrl = '<?php echo site_url('admin/medicines/change-status'); ?>';
-
-    var searchTimer = null;
-
-    function updateCsrfToken(hash) {
-        if (!hash) {
-            return;
-        }
-
-        csrfHash = hash;
-        $('input[name="' + csrfName + '"]').val(csrfHash);
-    }
-
-    function escapeHtml(value) {
-        return $('<div>').text(value === null || value === undefined ? '' : value).html();
-    }
-
-    function showAlert(type, message) {
-        var alertClass = type === 'success' ? 'success' : 'danger';
-        var html = ''
-            + '<div class="alert alert-' + alertClass + ' alert-dismissible fade show" role="alert">'
-            + escapeHtml(message)
-            + '<button type="button" class="close" data-dismiss="alert" aria-label="Close">'
-            + '<span aria-hidden="true">&times;</span>'
-            + '</button>'
-            + '</div>';
-
-        $('#medicineAlert').html(html);
-    }
-
-    function clearValidationErrors(formSelector) {
-        $(formSelector).find('.validation-message').text('');
-        $(formSelector).find('.form-control').removeClass('is-invalid');
-    }
-
-    function applyValidationErrors(formSelector, errors) {
-        if (!errors) {
-            return;
-        }
-
-        $.each(errors, function (field, message) {
-            if (!message) {
-                return;
-            }
-
-            $(formSelector).find('[name="' + field + '"]').addClass('is-invalid');
-            $(formSelector).find('.validation-message[data-field="' + field + '"]').text(message);
-        });
-    }
-
-    function renderStatusBadge(status) {
-        if (parseInt(status, 10) === 1) {
-            return '<span class="badge badge-success">Active</span>';
-        }
-
-        return '<span class="badge badge-secondary">Inactive</span>';
-    }
-
-    function renderStockBadge(quantity) {
-        var qty = parseInt(quantity, 10);
-
-        if (qty <= 0) {
-            return '<span class="badge badge-danger">' + qty + '</span>';
-        }
-
-        return '<span class="badge badge-info">' + qty + '</span>';
-    }
-
-    function renderRows(rows) {
-        var html = '';
-
-        if (!rows || rows.length === 0) {
-            $('#medicinesTableBody').html('<tr><td colspan="7" class="text-center">No medicines found.</td></tr>');
-            return;
-        }
-
-        $.each(rows, function (index, medicine) {
-            var toggleText = parseInt(medicine.status, 10) === 1 ? 'Deactivate' : 'Activate';
-            var toggleClass = parseInt(medicine.status, 10) === 1 ? 'btn-warning' : 'btn-success';
-
-            html += '<tr>';
-            html += '<td><strong>' + escapeHtml(medicine.medicine_name) + '</strong></td>';
-            html += '<td>' + (medicine.generic_name ? escapeHtml(medicine.generic_name) : '-') + '</td>';
-            html += '<td>' + escapeHtml(medicine.unit) + '</td>';
-            html += '<td>' + renderStockBadge(medicine.stock_quantity) + '</td>';
-            html += '<td>' + escapeHtml(parseFloat(medicine.unit_price).toFixed(2)) + '</td>';
-            html += '<td>' + renderStatusBadge(medicine.status) + '</td>';
-            html += '<td>';
-            html += '<button type="button" class="btn btn-info btn-sm mr-1 btn-edit-medicine" data-id="' + escapeHtml(medicine.id) + '">';
-            html += '<i class="fas fa-edit mr-1"></i>Edit';
-            html += '</button>';
-            html += '<button type="button" class="btn ' + toggleClass + ' btn-sm btn-toggle-status" data-id="' + escapeHtml(medicine.id) + '">';
-            html += '<i class="fas fa-sync-alt mr-1"></i>' + toggleText;
-            html += '</button>';
-            html += '</td>';
-            html += '</tr>';
-        });
-
-        $('#medicinesTableBody').html(html);
-    }
-
-    function loadMedicines() {
-        $('#medicinesTableBody').html('<tr><td colspan="7" class="text-center">Loading medicines...</td></tr>');
-
-        $.ajax({
-            url: listUrl,
-            type: 'GET',
-            dataType: 'json',
-            data: {
-                search: $('#medicineSearch').val(),
-                status: $('#statusFilter').val()
-            },
-            success: function (response) {
-                updateCsrfToken(response.csrfHash);
-
-                if (response.status) {
-                    renderRows(response.data);
-                    return;
-                }
-
-                renderRows([]);
-                showAlert('danger', response.message || 'Unable to load medicines.');
-            },
-            error: function () {
-                renderRows([]);
-                showAlert('danger', 'Unable to load medicines.');
-            }
-        });
-    }
-
-    function resetAddForm() {
-        $('#addMedicineForm')[0].reset();
-        $('#add_stock_quantity').val('0');
-        $('#add_unit_price').val('0.00');
-        clearValidationErrors('#addMedicineForm');
-    }
-
-    function resetEditForm() {
-        $('#editMedicineForm')[0].reset();
-        $('#edit_medicine_id').val('');
-        clearValidationErrors('#editMedicineForm');
-    }
-
-    $('#addMedicineButton').on('click', function () {
-        resetAddForm();
-        $('#addMedicineModal').modal('show');
+    // Initialize the Medicines module
+    Medicines.init({
+        csrfName: '<?php echo $this->security->get_csrf_token_name(); ?>',
+        csrfHash: '<?php echo $this->security->get_csrf_hash(); ?>',
+        listUrl: '<?php echo site_url('admin/medicines/ajax-list'); ?>',
+        storeUrl: '<?php echo site_url('admin/medicines/store'); ?>',
+        editBaseUrl: '<?php echo site_url('admin/medicines/edit'); ?>',
+        updateBaseUrl: '<?php echo site_url('admin/medicines/update'); ?>',
+        changeStatusBaseUrl: '<?php echo site_url('admin/medicines/change-status'); ?>'
     });
-
-    $('#medicineSearch').on('keyup', function () {
-        window.clearTimeout(searchTimer);
-
-        searchTimer = window.setTimeout(function () {
-            loadMedicines();
-        }, 300);
-    });
-
-    $('#statusFilter').on('change', function () {
-        loadMedicines();
-    });
-
-    $('#clearFiltersButton').on('click', function () {
-        $('#medicineSearch').val('');
-        $('#statusFilter').val('');
-        loadMedicines();
-    });
-
-    $('#addMedicineForm').on('submit', function (event) {
-        event.preventDefault();
-
-        clearValidationErrors('#addMedicineForm');
-
-        var $button = $('#saveMedicineButton');
-        var originalText = $button.text();
-
-        $button.prop('disabled', true).text('Saving...');
-
-        $.ajax({
-            url: storeUrl,
-            type: 'POST',
-            dataType: 'json',
-            data: $(this).serialize(),
-            success: function (response) {
-                updateCsrfToken(response.csrfHash);
-
-                if (response.status) {
-                    $('#addMedicineModal').modal('hide');
-                    resetAddForm();
-                    loadMedicines();
-                    showAlert('success', response.message);
-                    return;
-                }
-
-                applyValidationErrors('#addMedicineForm', response.errors);
-                showAlert('danger', response.message || 'Unable to create medicine.');
-            },
-            error: function () {
-                showAlert('danger', 'Unable to create medicine.');
-            },
-            complete: function () {
-                $button.prop('disabled', false).text(originalText);
-            }
-        });
-    });
-
-    $(document).on('click', '.btn-edit-medicine', function () {
-        var medicineId = $(this).data('id');
-
-        resetEditForm();
-
-        $.ajax({
-            url: editBaseUrl + '/' + medicineId,
-            type: 'GET',
-            dataType: 'json',
-            success: function (response) {
-                updateCsrfToken(response.csrfHash);
-
-                if (!response.status) {
-                    showAlert('danger', response.message || 'Medicine not found.');
-                    return;
-                }
-
-                $('#edit_medicine_id').val(response.data.id);
-                $('#edit_medicine_name').val(response.data.medicine_name);
-                $('#edit_generic_name').val(response.data.generic_name || '');
-                $('#edit_unit').val(response.data.unit);
-                $('#edit_stock_quantity').val(response.data.stock_quantity);
-                $('#edit_unit_price').val(response.data.unit_price);
-                $('#edit_description').val(response.data.description || '');
-                $('#edit_status').val(response.data.status);
-
-                $('#editMedicineModal').modal('show');
-            },
-            error: function () {
-                showAlert('danger', 'Unable to fetch medicine details.');
-            }
-        });
-    });
-
-    $('#editMedicineForm').on('submit', function (event) {
-        event.preventDefault();
-
-        clearValidationErrors('#editMedicineForm');
-
-        var medicineId = $('#edit_medicine_id').val();
-        var $button = $('#updateMedicineButton');
-        var originalText = $button.text();
-
-        $button.prop('disabled', true).text('Updating...');
-
-        $.ajax({
-            url: updateBaseUrl + '/' + medicineId,
-            type: 'POST',
-            dataType: 'json',
-            data: $(this).serialize(),
-            success: function (response) {
-                updateCsrfToken(response.csrfHash);
-
-                if (response.status) {
-                    $('#editMedicineModal').modal('hide');
-                    resetEditForm();
-                    loadMedicines();
-                    showAlert('success', response.message);
-                    return;
-                }
-
-                applyValidationErrors('#editMedicineForm', response.errors);
-                showAlert('danger', response.message || 'Unable to update medicine.');
-            },
-            error: function () {
-                showAlert('danger', 'Unable to update medicine.');
-            },
-            complete: function () {
-                $button.prop('disabled', false).text(originalText);
-            }
-        });
-    });
-
-    $(document).on('click', '.btn-toggle-status', function () {
-        var medicineId = $(this).data('id');
-
-        if (!window.confirm('Are you sure you want to change this medicine status?')) {
-            return;
-        }
-
-        var payload = {};
-        payload[csrfName] = csrfHash;
-
-        $.ajax({
-            url: changeStatusBaseUrl + '/' + medicineId,
-            type: 'POST',
-            dataType: 'json',
-            data: payload,
-            success: function (response) {
-                updateCsrfToken(response.csrfHash);
-
-                if (response.status) {
-                    loadMedicines();
-                    showAlert('success', response.message);
-                    return;
-                }
-
-                showAlert('danger', response.message || 'Unable to change medicine status.');
-            },
-            error: function () {
-                showAlert('danger', 'Unable to change medicine status.');
-            }
-        });
-    });
-
-    $('#addMedicineModal').on('hidden.bs.modal', function () {
-        resetAddForm();
-    });
-
-    $('#editMedicineModal').on('hidden.bs.modal', function () {
-        resetEditForm();
-    });
-
-    loadMedicines();
 });
 </script>

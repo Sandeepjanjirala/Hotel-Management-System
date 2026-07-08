@@ -3,12 +3,12 @@
 <div class="content-wrapper">
     <div class="content-header">
         <div class="container-fluid">
-            <div class="row mb-2">
+            <div class="row mb-2 align-items-center">
                 <div class="col-sm-6">
-                    <h1>Doctor Profile Management</h1>
+                    <h1>Doctor Profile Setup</h1>
                 </div>
                 <div class="col-sm-6">
-                    <ol class="breadcrumb float-sm-right">
+                    <ol class="breadcrumb float-sm-right mb-0">
                         <li class="breadcrumb-item"><a href="<?php echo site_url('admin'); ?>">Home</a></li>
                         <li class="breadcrumb-item active">Doctors</li>
                     </ol>
@@ -23,31 +23,34 @@
 
             <div class="card">
                 <div class="card-header">
-                    <h3 class="card-title">Doctor Profiles</h3>
+                    <h3 class="card-title mb-0">
+                        <i class="fas fa-user-md mr-1"></i> Doctor Profiles
+                    </h3>
                     <div class="card-tools">
                         <button type="button" class="btn btn-primary btn-sm" id="addDoctorButton">
-                            <i class="fas fa-plus mr-1"></i> Add Doctor Profile
+                            <i class="fas fa-plus mr-1"></i> Setup Doctor Profile
                         </button>
                     </div>
                 </div>
+
                 <div class="card-body">
                     <div class="table-responsive">
                         <table class="table table-bordered table-hover mb-0">
                             <thead>
                                 <tr>
-                                    <th style="width: 70px;">ID</th>
-                                    <th style="width: 180px;">Doctor Name</th>
-                                    <th style="width: 180px;">Email</th>
-                                    <th style="width: 150px;">Department</th>
-                                    <th style="width: 150px;">Specialization</th>
-                                    <th style="width: 100px;">Fee</th>
-                                    <th style="width: 100px;">Status</th>
+                                    <th>Doctor</th>
+                                    <th>Department</th>
+                                    <th>Specialization</th>
+                                    <th>Qualification</th>
+                                    <th>Fee</th>
+                                    <th>Available Days</th>
+                                    <th>Status</th>
                                     <th style="width: 180px;">Actions</th>
                                 </tr>
                             </thead>
                             <tbody id="doctorsTableBody">
                                 <tr>
-                                    <td colspan="8" class="text-center">Loading doctors...</td>
+                                    <td colspan="8" class="text-center">Loading doctor profiles...</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -64,7 +67,7 @@
         <div class="modal-content">
             <form id="addDoctorForm" autocomplete="off">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="addDoctorModalLabel">Add Doctor Profile</h5>
+                    <h5 class="modal-title" id="addDoctorModalLabel">Setup Doctor Profile</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
@@ -82,7 +85,7 @@
                             <div class="form-group">
                                 <label for="add_user_id">Doctor User</label>
                                 <select class="form-control" id="add_user_id" name="user_id">
-                                    <option value="">Select Doctor User</option>
+                                    <option value="">Loading doctor users...</option>
                                 </select>
                                 <small class="text-danger validation-message" data-field="user_id"></small>
                             </div>
@@ -92,7 +95,7 @@
                             <div class="form-group">
                                 <label for="add_department_id">Department</label>
                                 <select class="form-control" id="add_department_id" name="department_id">
-                                    <option value="">Select Department</option>
+                                    <option value="">Loading departments...</option>
                                 </select>
                                 <small class="text-danger validation-message" data-field="department_id"></small>
                             </div>
@@ -103,7 +106,7 @@
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label for="add_specialization">Specialization</label>
-                                <input type="text" class="form-control" id="add_specialization" name="specialization" maxlength="150">
+                                <input type="text" class="form-control" id="add_specialization" name="specialization" maxlength="150" placeholder="e.g., Cardiologist">
                                 <small class="text-danger validation-message" data-field="specialization"></small>
                             </div>
                         </div>
@@ -111,23 +114,23 @@
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label for="add_qualification">Qualification</label>
-                                <input type="text" class="form-control" id="add_qualification" name="qualification" maxlength="200">
+                                <input type="text" class="form-control" id="add_qualification" name="qualification" maxlength="200" placeholder="e.g., MBBS, MD">
                                 <small class="text-danger validation-message" data-field="qualification"></small>
                             </div>
                         </div>
                     </div>
 
                     <div class="row">
-                        <div class="col-md-4">
-                            <div class="form-group">
-                                <label for="add_consultation_fee">Consultation Fee</label>
-                                <input type="number" step="0.01" class="form-control" id="add_consultation_fee" name="consultation_fee" value="0.00">
+                        <div class="col-md-6">
+                            <div class="form-group mb-md-0">
+                                <label for="add_consultation_fee">Consultation Fee (₹)</label>
+                                <input type="number" step="0.01" min="0" class="form-control" id="add_consultation_fee" name="consultation_fee" placeholder="500.00">
                                 <small class="text-danger validation-message" data-field="consultation_fee"></small>
                             </div>
                         </div>
 
-                        <div class="col-md-4">
-                            <div class="form-group">
+                        <div class="col-md-6">
+                            <div class="form-group mb-0">
                                 <label for="add_status">Status</label>
                                 <select class="form-control" id="add_status" name="status">
                                     <option value="1">Active</option>
@@ -136,54 +139,33 @@
                                 <small class="text-danger validation-message" data-field="status"></small>
                             </div>
                         </div>
+                    </div>
 
-                        <div class="col-md-4">
-                            <div class="form-group">
-                                <label>Available Days</label>
-                                <div class="row">
-                                    <div class="col-6">
-                                        <div class="form-check">
-                                            <input type="checkbox" class="form-check-input" name="available_days[]" value="Monday" id="add_mon">
-                                            <label class="form-check-label" for="add_mon">Mon</label>
-                                        </div>
-                                        <div class="form-check">
-                                            <input type="checkbox" class="form-check-input" name="available_days[]" value="Tuesday" id="add_tue">
-                                            <label class="form-check-label" for="add_tue">Tue</label>
-                                        </div>
-                                        <div class="form-check">
-                                            <input type="checkbox" class="form-check-input" name="available_days[]" value="Wednesday" id="add_wed">
-                                            <label class="form-check-label" for="add_wed">Wed</label>
-                                        </div>
-                                        <div class="form-check">
-                                            <input type="checkbox" class="form-check-input" name="available_days[]" value="Thursday" id="add_thu">
-                                            <label class="form-check-label" for="add_thu">Thu</label>
-                                        </div>
-                                    </div>
-                                    <div class="col-6">
-                                        <div class="form-check">
-                                            <input type="checkbox" class="form-check-input" name="available_days[]" value="Friday" id="add_fri">
-                                            <label class="form-check-label" for="add_fri">Fri</label>
-                                        </div>
-                                        <div class="form-check">
-                                            <input type="checkbox" class="form-check-input" name="available_days[]" value="Saturday" id="add_sat">
-                                            <label class="form-check-label" for="add_sat">Sat</label>
-                                        </div>
-                                        <div class="form-check">
-                                            <input type="checkbox" class="form-check-input" name="available_days[]" value="Sunday" id="add_sun">
-                                            <label class="form-check-label" for="add_sun">Sun</label>
-                                        </div>
+                    <div class="form-group mt-3 mb-0">
+                        <label>Available Days</label>
+                        <div class="row">
+                            <?php
+                                $days = array('Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday');
+                                foreach ($days as $day):
+                            ?>
+                                <div class="col-md-3 col-sm-4 col-6">
+                                    <div class="custom-control custom-checkbox mb-2">
+                                        <input type="checkbox" class="custom-control-input add-day" id="add_day_<?php echo html_escape($day); ?>" name="available_days[]" value="<?php echo html_escape($day); ?>">
+                                        <label class="custom-control-label" for="add_day_<?php echo html_escape($day); ?>">
+                                            <?php echo html_escape($day); ?>
+                                        </label>
                                     </div>
                                 </div>
-                                <small class="text-danger validation-message" data-field="available_days"></small>
-                            </div>
+                            <?php endforeach; ?>
                         </div>
+                        <small class="text-danger validation-message" data-field="available_days"></small>
                     </div>
                 </div>
 
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
                     <button type="submit" class="btn btn-primary" id="saveDoctorButton">
-                        <i class="fas fa-save mr-1"></i> Save Doctor
+                        <i class="fas fa-save mr-1"></i> Save Profile
                     </button>
                 </div>
             </form>
@@ -209,19 +191,24 @@
                         name="<?php echo $this->security->get_csrf_token_name(); ?>"
                         value="<?php echo $this->security->get_csrf_hash(); ?>"
                     >
-                    <input type="hidden" id="edit_doctor_id" name="doctor_id">
+                    <!-- FIXED: Use consistent ID name -->
+                    <input type="hidden" id="edit_doctor_id" name="edit_doctor_id">
+
+                    <div class="alert alert-light border">
+                        <i class="fas fa-user-md mr-1"></i>
+                        Doctor User:
+                        <strong id="edit_doctor_user_name">-</strong>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="edit_department_id">Department</label>
+                        <select class="form-control" id="edit_department_id" name="department_id">
+                            <option value="">Loading departments...</option>
+                        </select>
+                        <small class="text-danger validation-message" data-field="department_id"></small>
+                    </div>
 
                     <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label for="edit_department_id">Department</label>
-                                <select class="form-control" id="edit_department_id" name="department_id">
-                                    <option value="">Select Department</option>
-                                </select>
-                                <small class="text-danger validation-message" data-field="department_id"></small>
-                            </div>
-                        </div>
-
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label for="edit_specialization">Specialization</label>
@@ -229,9 +216,7 @@
                                 <small class="text-danger validation-message" data-field="specialization"></small>
                             </div>
                         </div>
-                    </div>
 
-                    <div class="row">
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label for="edit_qualification">Qualification</label>
@@ -239,19 +224,19 @@
                                 <small class="text-danger validation-message" data-field="qualification"></small>
                             </div>
                         </div>
-
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label for="edit_consultation_fee">Consultation Fee</label>
-                                <input type="number" step="0.01" class="form-control" id="edit_consultation_fee" name="consultation_fee" value="0.00">
-                                <small class="text-danger validation-message" data-field="consultation_fee"></small>
-                            </div>
-                        </div>
                     </div>
 
                     <div class="row">
                         <div class="col-md-6">
-                            <div class="form-group">
+                            <div class="form-group mb-md-0">
+                                <label for="edit_consultation_fee">Consultation Fee (₹)</label>
+                                <input type="number" step="0.01" min="0" class="form-control" id="edit_consultation_fee" name="consultation_fee">
+                                <small class="text-danger validation-message" data-field="consultation_fee"></small>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="form-group mb-0">
                                 <label for="edit_status">Status</label>
                                 <select class="form-control" id="edit_status" name="status">
                                     <option value="1">Active</option>
@@ -260,54 +245,30 @@
                                 <small class="text-danger validation-message" data-field="status"></small>
                             </div>
                         </div>
+                    </div>
 
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label>Available Days</label>
-                                <div class="row">
-                                    <div class="col-6">
-                                        <div class="form-check">
-                                            <input type="checkbox" class="form-check-input" name="available_days[]" value="Monday" id="edit_mon">
-                                            <label class="form-check-label" for="edit_mon">Mon</label>
-                                        </div>
-                                        <div class="form-check">
-                                            <input type="checkbox" class="form-check-input" name="available_days[]" value="Tuesday" id="edit_tue">
-                                            <label class="form-check-label" for="edit_tue">Tue</label>
-                                        </div>
-                                        <div class="form-check">
-                                            <input type="checkbox" class="form-check-input" name="available_days[]" value="Wednesday" id="edit_wed">
-                                            <label class="form-check-label" for="edit_wed">Wed</label>
-                                        </div>
-                                        <div class="form-check">
-                                            <input type="checkbox" class="form-check-input" name="available_days[]" value="Thursday" id="edit_thu">
-                                            <label class="form-check-label" for="edit_thu">Thu</label>
-                                        </div>
-                                    </div>
-                                    <div class="col-6">
-                                        <div class="form-check">
-                                            <input type="checkbox" class="form-check-input" name="available_days[]" value="Friday" id="edit_fri">
-                                            <label class="form-check-label" for="edit_fri">Fri</label>
-                                        </div>
-                                        <div class="form-check">
-                                            <input type="checkbox" class="form-check-input" name="available_days[]" value="Saturday" id="edit_sat">
-                                            <label class="form-check-label" for="edit_sat">Sat</label>
-                                        </div>
-                                        <div class="form-check">
-                                            <input type="checkbox" class="form-check-input" name="available_days[]" value="Sunday" id="edit_sun">
-                                            <label class="form-check-label" for="edit_sun">Sun</label>
-                                        </div>
+                    <div class="form-group mt-3 mb-0">
+                        <label>Available Days</label>
+                        <div class="row">
+                            <?php foreach ($days as $day): ?>
+                                <div class="col-md-3 col-sm-4 col-6">
+                                    <div class="custom-control custom-checkbox mb-2">
+                                        <input type="checkbox" class="custom-control-input edit-day" id="edit_day_<?php echo html_escape($day); ?>" name="available_days[]" value="<?php echo html_escape($day); ?>">
+                                        <label class="custom-control-label" for="edit_day_<?php echo html_escape($day); ?>">
+                                            <?php echo html_escape($day); ?>
+                                        </label>
                                     </div>
                                 </div>
-                                <small class="text-danger validation-message" data-field="available_days"></small>
-                            </div>
+                            <?php endforeach; ?>
                         </div>
+                        <small class="text-danger validation-message" data-field="available_days"></small>
                     </div>
                 </div>
 
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
                     <button type="submit" class="btn btn-primary" id="updateDoctorButton">
-                        <i class="fas fa-edit mr-1"></i> Update Doctor
+                        <i class="fas fa-edit mr-1"></i> Update Profile
                     </button>
                 </div>
             </form>
@@ -319,17 +280,16 @@
 <script src="<?php echo base_url('assets/js/modules/doctors.js'); ?>"></script>
 
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Initialize the Doctors module
+document.addEventListener('DOMContentLoaded', function () {
     Doctors.init({
         csrfName: '<?php echo $this->security->get_csrf_token_name(); ?>',
         csrfHash: '<?php echo $this->security->get_csrf_hash(); ?>',
-        listUrl: '<?php echo site_url('admin/admin_doctors/get_doctors_ajax'); ?>',
-        storeUrl: '<?php echo site_url('admin/admin_doctors/store'); ?>',
-        editBaseUrl: '<?php echo site_url('admin/admin_doctors/edit'); ?>',
-        updateBaseUrl: '<?php echo site_url('admin/admin_doctors/update'); ?>',
-        changeStatusBaseUrl: '<?php echo site_url('admin/admin_doctors/change_status'); ?>',
-        setupOptionsUrl: '<?php echo site_url('admin/admin_doctors/get_setup_options'); ?>'
+        listUrl: '<?php echo site_url('admin/doctors/get_doctors_ajax'); ?>',
+        optionsUrl: '<?php echo site_url('admin/doctors/get_setup_options'); ?>',
+        storeUrl: '<?php echo site_url('admin/doctors/store'); ?>',
+        editBaseUrl: '<?php echo site_url('admin/doctors/edit'); ?>',
+        updateBaseUrl: '<?php echo site_url('admin/doctors/update'); ?>',
+        changeStatusBaseUrl: '<?php echo site_url('admin/doctors/change_status'); ?>'
     });
 });
 </script>

@@ -9,7 +9,7 @@ class Admin_pharmacy extends MY_Controller
 
         $this->require_role(array('admin', 'receptionist'));
         $this->load->model('Pharmacy_bill_model');
-        $this->form_validation->set_error_delimiters('<div class="text-danger small">', '</div>');
+        $this->form_validation->set_error_delimiters('', '');
     }
 
     public function index()
@@ -46,6 +46,7 @@ class Admin_pharmacy extends MY_Controller
         $this->load->view('admin/layouts/footer', $data);
     }
 
+    // FIXED: Method name matches route
     public function get_bills_ajax()
     {
         $filters = array(
@@ -59,6 +60,7 @@ class Admin_pharmacy extends MY_Controller
         ));
     }
 
+    // FIXED: Method name matches route
     public function get_prescription_ajax($id)
     {
         $prescription = $this->Pharmacy_bill_model->get_prescription_details((int) $id);
@@ -234,12 +236,12 @@ class Admin_pharmacy extends MY_Controller
         return TRUE;
     }
 
-    protected function json_response($response, $status_code = 200)
-    {
-        $response['csrfHash'] = $this->security->get_csrf_hash();
+    // protected function json_response($response)
+    // {
+    //     $response['csrfHash'] = $this->security->get_csrf_hash();
 
-        return $this->output
-            ->set_content_type('application/json')
-            ->set_output(json_encode($response));
-    }
+    //     return $this->output
+    //         ->set_content_type('application/json')
+    //         ->set_output(json_encode($response));
+    // }
 }

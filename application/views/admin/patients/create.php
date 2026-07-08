@@ -21,21 +21,6 @@
         <div class="container-fluid">
             <div id="hmsNotificationArea"></div>
 
-            <?php if ($this->session->flashdata('error')): ?>
-                <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                    <?php echo html_escape($this->session->flashdata('error')); ?>
-                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-            <?php endif; ?>
-
-            <?php if (validation_errors()): ?>
-                <div class="alert alert-danger" role="alert">
-                    Please correct the highlighted errors and submit again.
-                </div>
-            <?php endif; ?>
-
             <div class="card card-primary card-outline">
                 <div class="card-header">
                     <h3 class="card-title mb-0">
@@ -48,7 +33,9 @@
                     </div>
                 </div>
 
-                <?php echo form_open('admin/patients/store', array('autocomplete' => 'off', 'class' => 'js-ajax-patient-form')); ?>
+                <?php echo form_open('', array('autocomplete' => 'off', 'class' => 'js-ajax-patient-form', 'id' => 'createPatientForm')); ?>
+                    <input type="hidden" name="<?php echo $this->security->get_csrf_token_name(); ?>" value="<?php echo $this->security->get_csrf_hash(); ?>">
+
                     <div class="card-body">
                         <div class="alert alert-light border">
                             Patient code will be generated automatically. Next expected code:
@@ -163,10 +150,19 @@
     </section>
 </div>
 
+<!-- Include Patient Module Script -->
+<script src="<?php echo base_url('assets/js/modules/patients.js'); ?>"></script>
+
 <script>
 document.addEventListener('DOMContentLoaded', function () {
-    HMSAjax.bindAjaxForm('.js-ajax-patient-form', {
-        notificationTarget: '#hmsNotificationArea'
+    Patients.init({
+        csrfName: '<?php echo $this->security->get_csrf_token_name(); ?>',
+        csrfHash: '<?php echo $this->security->get_csrf_hash(); ?>',
+        listUrl: '<?php echo site_url('admin/patients/get_patients_ajax'); ?>',
+        storeUrl: '<?php echo site_url('admin/patients/store'); ?>',
+        editBaseUrl: '<?php echo site_url('admin/patients/edit'); ?>',
+        updateBaseUrl: '<?php echo site_url('admin/patients/update'); ?>',
+        changeStatusBaseUrl: '<?php echo site_url('admin/patients/change_status'); ?>'
     });
 });
 </script>

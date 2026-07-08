@@ -26,10 +26,10 @@
             <td><?php echo html_escape($appointment['appointment_time']); ?></td>
             <td><?php echo $badge; ?></td>
             <td>
-                <a href="<?php echo site_url('admin/appointments/edit/' . (int) $appointment['id']); ?>" class="btn btn-info btn-sm mr-1 js-edit-appointment" data-id="<?php echo (int) $appointment['id']; ?>">
+                <a href="#" class="btn btn-info btn-sm mr-1 js-edit-appointment" data-id="<?php echo (int) $appointment['id']; ?>">
                     <i class="fas fa-edit mr-1"></i>Edit
                 </a>
-                <select class="form-control form-control-sm d-inline-block appointment-status-select js-appointment-status" data-id="<?php echo (int) $appointment['id']; ?>" style="width: 125px;">
+                <select class="form-control form-control-sm d-inline-block js-appointment-status" data-id="<?php echo (int) $appointment['id']; ?>" style="width: 125px; display: inline-block;">
                     <option value="scheduled" <?php echo $status === 'scheduled' ? 'selected' : ''; ?>>Scheduled</option>
                     <option value="completed" <?php echo $status === 'completed' ? 'selected' : ''; ?>>Completed</option>
                     <option value="cancelled" <?php echo $status === 'cancelled' ? 'selected' : ''; ?>>Cancelled</option>

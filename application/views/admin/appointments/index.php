@@ -9,7 +9,7 @@
                 </div>
                 <div class="col-sm-6">
                     <ol class="breadcrumb float-sm-right mb-0">
-                        <li class="breadcrumb-item"><a href="<?php echo site_url('admin/appointments'); ?>">Home</a></li>
+                        <li class="breadcrumb-item"><a href="<?php echo site_url('admin'); ?>">Home</a></li>
                         <li class="breadcrumb-item active">Appointments</li>
                     </ol>
                 </div>
@@ -19,24 +19,6 @@
 
     <section class="content">
         <div class="container-fluid">
-            <?php if ($this->session->flashdata('success')): ?>
-                <div class="alert alert-success alert-dismissible fade show" role="alert">
-                    <?php echo html_escape($this->session->flashdata('success')); ?>
-                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-            <?php endif; ?>
-
-            <?php if ($this->session->flashdata('error')): ?>
-                <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                    <?php echo html_escape($this->session->flashdata('error')); ?>
-                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-            <?php endif; ?>
-
             <div id="appointmentAlert"></div>
 
             <div class="card">
@@ -45,7 +27,7 @@
                         <i class="fas fa-calendar-check mr-1"></i> Appointment List
                     </h3>
                     <div class="card-tools">
-                        <a href="<?php echo site_url('admin/appointments/create'); ?>" class="btn btn-primary btn-sm js-create-appointment" id="btnOpenBook">
+                        <a href="<?php echo site_url('admin/appointments/create'); ?>" class="btn btn-primary btn-sm" id="btnOpenBook">
                             <i class="fas fa-plus mr-1"></i> Book Appointment
                         </a>
                     </div>
@@ -108,7 +90,6 @@
                         </table>
                     </div>
 
-                    <!-- AJAX Pagination -->
                     <div class="d-flex justify-content-between align-items-center mt-3 flex-wrap">
                         <div id="paginationInfo" class="text-muted small mb-2 mb-md-0"></div>
                         <div id="paginationLinks"></div>
@@ -136,13 +117,15 @@
     </div>
 </div>
 
+<script src="<?php echo base_url('assets/js/modules/appointments.js'); ?>"></script>
+
 <script>
-    window.HMS_APPOINTMENT_CONFIG = {
+document.addEventListener('DOMContentLoaded', function() {
+    AppointmentModule.init({
         listUrl: '<?php echo site_url('admin/appointments/ajax-list'); ?>',
         createUrl: '<?php echo site_url('admin/appointments/create'); ?>',
         editUrl: '<?php echo site_url('admin/appointments/edit'); ?>',
         changeStatusUrl: '<?php echo site_url('admin/appointments/change-status'); ?>'
-    };
+    });
+});
 </script>
-<script src="<?php echo base_url('assets/js/modules/appointments.js'); ?>"></script>
-

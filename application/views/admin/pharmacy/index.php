@@ -9,7 +9,7 @@
                 </div>
                 <div class="col-sm-6">
                     <ol class="breadcrumb float-sm-right mb-0">
-                        <li class="breadcrumb-item"><a href="<?php echo site_url('admin/pharmacy-billing'); ?>">Home</a></li>
+                        <li class="breadcrumb-item"><a href="<?php echo site_url('admin'); ?>">Home</a></li>
                         <li class="breadcrumb-item active">Pharmacy Billing</li>
                     </ol>
                 </div>
@@ -73,97 +73,12 @@
         </div>
     </section>
 </div>
+<script src="<?php echo base_url('assets/js/modules/pharmacy.js'); ?>"></script>
 
 <script>
-document.addEventListener('DOMContentLoaded', function () {
-    var listUrl = '<?php echo site_url('admin/pharmacy-billing/ajax-list'); ?>';
-    var searchTimer = null;
-
-    function escapeHtml(value) {
-        return $('<div>').text(value === null || value === undefined ? '' : value).html();
-    }
-
-    function showAlert(type, message) {
-        var alertClass = type === 'success' ? 'success' : 'danger';
-        var html = ''
-            + '<div class="alert alert-' + alertClass + ' alert-dismissible fade show" role="alert">'
-            + escapeHtml(message)
-            + '<button type="button" class="close" data-dismiss="alert" aria-label="Close">'
-            + '<span aria-hidden="true">&times;</span>'
-            + '</button>'
-            + '</div>';
-
-        $('#pharmacyBillAlert').html(html);
-    }
-
-    function renderRows(rows) {
-        var html = '';
-
-        if (!rows || rows.length === 0) {
-            $('#billsTableBody').html('<tr><td colspan="7" class="text-center">No pharmacy bills found.</td></tr>');
-            return;
-        }
-
-        $.each(rows, function (index, bill) {
-            html += '<tr>';
-            html += '<td><strong>' + escapeHtml(bill.bill_code) + '</strong></td>';
-            html += '<td>' + escapeHtml(bill.appointment_code) + '<br><small class="text-muted">Prescription: ' + escapeHtml(bill.prescription_date) + '</small></td>';
-            html += '<td>' + escapeHtml(bill.patient_name) + '<br><small class="text-muted">' + escapeHtml(bill.patient_code) + '</small></td>';
-            html += '<td>' + escapeHtml(bill.doctor_name) + '</td>';
-            html += '<td>' + escapeHtml(bill.bill_date) + '</td>';
-            html += '<td><span class="badge badge-info">' + escapeHtml(bill.item_count) + '</span></td>';
-            html += '<td><strong>' + escapeHtml(parseFloat(bill.total_amount).toFixed(2)) + '</strong></td>';
-            html += '</tr>';
-        });
-
-        $('#billsTableBody').html(html);
-    }
-
-    function loadBills() {
-        $('#billsTableBody').html('<tr><td colspan="7" class="text-center">Loading pharmacy bills...</td></tr>');
-
-        $.ajax({
-            url: listUrl,
-            type: 'GET',
-            dataType: 'json',
-            data: {
-                search: $('#billSearch').val(),
-                bill_date: $('#billDateFilter').val()
-            },
-            success: function (response) {
-                if (response.status) {
-                    renderRows(response.data);
-                    return;
-                }
-
-                renderRows([]);
-                showAlert('danger', response.message || 'Unable to load pharmacy bills.');
-            },
-            error: function () {
-                renderRows([]);
-                showAlert('danger', 'Unable to load pharmacy bills.');
-            }
-        });
-    }
-
-    $('#billSearch').on('keyup', function () {
-        window.clearTimeout(searchTimer);
-
-        searchTimer = window.setTimeout(function () {
-            loadBills();
-        }, 300);
+document.addEventListener('DOMContentLoaded', function() {
+    PharmacyModule.init({
+        listUrl: '<?php echo site_url('admin/pharmacy-billing/ajax-list'); ?>'
     });
-
-    $('#billDateFilter').on('change', function () {
-        loadBills();
-    });
-
-    $('#clearFiltersButton').on('click', function () {
-        $('#billSearch').val('');
-        $('#billDateFilter').val('');
-        loadBills();
-    });
-
-    loadBills();
 });
 </script>

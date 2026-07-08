@@ -1,7 +1,6 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
 
-
 class Admin_doctors extends MY_Controller
 {
     public function __construct()
@@ -9,7 +8,7 @@ class Admin_doctors extends MY_Controller
         parent::__construct();
 
         $this->require_role(array('admin'));
-        $this->load->model('Doctor_model'); // Make sure this model exists
+        $this->load->model('Doctor_model');
         $this->form_validation->set_error_delimiters('', '');
     }
 
@@ -25,24 +24,29 @@ class Admin_doctors extends MY_Controller
         $this->load->view('admin/layouts/header', $data);
         $this->load->view('admin/layouts/navbar', $data);
         $this->load->view('admin/layouts/sidebar', $data);
-        $this->load->view('admin/doctors/index', $data); // This should be the doctor view
+        $this->load->view('admin/doctors/index', $data);
         $this->load->view('admin/layouts/footer', $data);
     }
 
     public function get_doctors_ajax()
     {
+        $doctors = $this->Doctor_model->get_all();
+        
         return $this->json_response(array(
             'status' => TRUE,
-            'data' => $this->Admin_doctor_model->get_all()
+            'data' => $doctors
         ));
     }
 
     public function get_setup_options()
     {
+        $doctor_users = $this->Doctor_model->get_unprofiled_doctor_users();
+        $departments = $this->Doctor_model->get_active_departments();
+        
         return $this->json_response(array(
             'status' => TRUE,
-            'doctor_users' => $this->Doctor_model->get_unprofiled_doctor_users(),
-            'departments' => $this->Doctor_model->get_active_departments()
+            'doctor_users' => $doctor_users,
+            'departments' => $departments
         ));
     }
 
@@ -70,7 +74,7 @@ class Admin_doctors extends MY_Controller
         if (!$created) {
             return $this->json_response(array(
                 'status' => FALSE,
-                'message' => 'Unable to create doctor profile at the moment.'
+                'message' => 'Unable to create doctor profile. Please check the data and try again.'
             ));
         }
 
@@ -98,8 +102,62 @@ class Admin_doctors extends MY_Controller
         ));
     }
 
-    public function update($id)
+public function update($id)
+{
+    // DEBUG: Log the request
+    log_message('debug', 'UPDATE METHOD CALLED for ID: ' . $id);
+    log_message('debug', 'Request method: ' . $this->input->method());
+    log_message('debug', 'POST data: ' . print_r($this->input->post(NULL, TRUE), true));
+    
+    if ($this->input->method() !== 'post') {
+        return $this->json_response(array(
+            'status' => FALSE,
+            'message' => 'Invalid request method.'
+        ));
+    }
+
+    $doctor = $this->Doctor_model->get_by_id((int) $id);
+
+    if (empty($doctor)) {
+        log_message('debug', 'Doctor not found with ID: ' . $id);
+        return $this->json_response(array(
+            'status' => FALSE,
+            'message' => 'Doctor profile not found.'
+        ));
+    }
+
+    $validated = $this->validate_doctor_form('update');
+    
+    log_message('debug', 'Validation result: ' . print_r($validated, true));
+
+    if ($validated['status'] === FALSE) {
+        return $this->json_response(array(
+            'status' => FALSE,
+            'message' => 'Please correct the highlighted errors.',
+            'errors' => $validated['errors']
+        ));
+    }
+
+    $updated = $this->Doctor_model->update_profile((int) $id, $validated['data']);
+    
+    log_message('debug', 'Update result: ' . ($updated ? 'TRUE' : 'FALSE'));
+
+    if (!$updated) {
+        return $this->json_response(array(
+            'status' => FALSE,
+            'message' => 'Unable to update doctor profile. Please check the data and try again.'
+        ));
+    }
+
+    return $this->json_response(array(
+        'status' => TRUE,
+        'message' => 'Doctor profile updated successfully.'
+    ));
+}
+
+    public function change_status($id)
     {
+        // Check if it's a POST request
         if ($this->input->method() !== 'post') {
             return $this->json_response(array(
                 'status' => FALSE,
@@ -107,6 +165,7 @@ class Admin_doctors extends MY_Controller
             ));
         }
 
+        // Get the doctor profile
         $doctor = $this->Doctor_model->get_by_id((int) $id);
 
         if (empty($doctor)) {
@@ -116,61 +175,31 @@ class Admin_doctors extends MY_Controller
             ));
         }
 
-        $validated = $this->validate_doctor_form('update');
+        // Toggle the status
+        $result = $this->Doctor_model->toggle_status((int) $id);
 
-        if ($validated['status'] === FALSE) {
-            return $this->json_response(array(
-                'status' => FALSE,
-                'message' => 'Please correct the highlighted errors.',
-                'errors' => $validated['errors']
-            ));
-        }
-
-        $updated = $this->Doctor_model->update_profile((int) $id, $validated['data']);
-
-        if (!$updated) {
-            return $this->json_response(array(
-                'status' => FALSE,
-                'message' => 'Unable to update doctor profile at the moment.'
-            ));
-        }
-
-        return $this->json_response(array(
-            'status' => TRUE,
-            'message' => 'Doctor profile updated successfully.'
-        ));
-    }
-
-    public function change_status($id)
-    {
-        if ($this->input->method() !== 'post') {
-            return $this->json_response(array(
-                'status' => FALSE,
-                'message' => 'Invalid request method.'
-            ));
-        }
-
-        $doctor = $this->Doctor_model->toggle_status((int) $id);
-
-        if (!$doctor) {
+        if (!$result) {
             return $this->json_response(array(
                 'status' => FALSE,
                 'message' => 'Unable to change doctor profile status.'
             ));
         }
 
-        $message = ((int) $doctor['status'] === 1)
+        // Get the updated doctor data
+        $updated_doctor = $this->Doctor_model->get_by_id((int) $id);
+        
+        $message = ((int) $updated_doctor['status'] === 1)
             ? 'Doctor profile activated successfully.'
             : 'Doctor profile deactivated successfully.';
 
         return $this->json_response(array(
             'status' => TRUE,
             'message' => $message,
-            'data' => $doctor
+            'data' => $updated_doctor
         ));
     }
 
-    protected function validate_doctor_form($mode)
+    private function validate_doctor_form($mode)
     {
         $post_data = $this->input->post(NULL, TRUE);
 
@@ -254,14 +283,5 @@ class Admin_doctors extends MY_Controller
             'status' => TRUE,
             'data' => $data
         );
-    }
-
-    protected function json_response($response, $status_code = 200)
-    {
-        $response['csrfHash'] = $this->security->get_csrf_hash();
-
-        return $this->output
-            ->set_content_type('application/json')
-            ->set_output(json_encode($response));
     }
 }

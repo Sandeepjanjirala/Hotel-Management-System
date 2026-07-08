@@ -179,6 +179,7 @@ class Pharmacy_bill_model extends CI_Model
         }
 
         foreach ($items as $item) {
+            // Deduct stock
             $this->db
                 ->set('stock_quantity', 'stock_quantity - ' . (int) $item['quantity'], FALSE)
                 ->where('id', (int) $item['medicine_id'])

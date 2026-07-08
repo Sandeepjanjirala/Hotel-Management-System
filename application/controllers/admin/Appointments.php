@@ -9,7 +9,7 @@ class Appointments extends MY_Controller
 
         $this->require_role(array('admin', 'receptionist'));
         $this->load->model('Appointment_model');
-        $this->form_validation->set_error_delimiters('<div class="text-danger small">', '</div>');
+        $this->form_validation->set_error_delimiters('', '');
     }
 
     public function index()
@@ -42,9 +42,10 @@ class Appointments extends MY_Controller
         );
 
         if ($this->input->is_ajax_request()) {
+            $html = $this->load->view('admin/appointments/_form', array_merge($data, array('is_modal' => TRUE)), TRUE);
             return $this->json_response(array(
                 'status' => TRUE,
-                'html' => $this->load->view('admin/appointments/_form', array_merge($data, array('is_modal' => TRUE)), TRUE)
+                'html' => $html
             ));
         }
 
@@ -62,7 +63,7 @@ class Appointments extends MY_Controller
                 return $this->json_response(array(
                     'status' => FALSE,
                     'message' => 'Invalid request method.'
-                ), 400);
+                ));
             }
             redirect('admin/appointments');
             return;
@@ -74,7 +75,7 @@ class Appointments extends MY_Controller
                     'status' => FALSE,
                     'message' => 'Please correct the highlighted errors.',
                     'errors' => $this->validation_errors_array()
-                ), 422);
+                ));
             }
             $this->create();
             return;
@@ -87,7 +88,7 @@ class Appointments extends MY_Controller
                 return $this->json_response(array(
                     'status' => FALSE,
                     'message' => 'Unable to generate a unique appointment code. Please try again.'
-                ), 409);
+                ));
             }
             $this->session->set_flashdata('error', 'Unable to generate a unique appointment code. Please try again.');
             redirect('admin/appointments/create');
@@ -105,7 +106,7 @@ class Appointments extends MY_Controller
                 return $this->json_response(array(
                     'status' => FALSE,
                     'message' => 'Unable to book appointment at the moment.'
-                ), 500);
+                ));
             }
             $this->session->set_flashdata('error', 'Unable to book appointment at the moment.');
             redirect('admin/appointments/create');
@@ -132,7 +133,7 @@ class Appointments extends MY_Controller
                 return $this->json_response(array(
                     'status' => FALSE,
                     'message' => 'Appointment not found.'
-                ), 404);
+                ));
             }
             show_404();
             return;
@@ -149,9 +150,10 @@ class Appointments extends MY_Controller
         );
 
         if ($this->input->is_ajax_request()) {
+            $html = $this->load->view('admin/appointments/_form', array_merge($data, array('is_modal' => TRUE)), TRUE);
             return $this->json_response(array(
                 'status' => TRUE,
-                'html' => $this->load->view('admin/appointments/_form', array_merge($data, array('is_modal' => TRUE)), TRUE)
+                'html' => $html
             ));
         }
 
@@ -169,7 +171,7 @@ class Appointments extends MY_Controller
                 return $this->json_response(array(
                     'status' => FALSE,
                     'message' => 'Invalid request method.'
-                ), 400);
+                ));
             }
             redirect('admin/appointments');
             return;
@@ -182,19 +184,19 @@ class Appointments extends MY_Controller
                 return $this->json_response(array(
                     'status' => FALSE,
                     'message' => 'Appointment not found.'
-                ), 404);
+                ));
             }
             show_404();
             return;
         }
 
-        if ($this->validate_appointment_form(TRUE) === FALSE) {
+        if ($this->validate_appointment_form() === FALSE) {
             if ($this->input->is_ajax_request()) {
                 return $this->json_response(array(
                     'status' => FALSE,
                     'message' => 'Please correct the highlighted errors.',
                     'errors' => $this->validation_errors_array()
-                ), 422);
+                ));
             }
             $this->edit((int) $id);
             return;
@@ -207,7 +209,7 @@ class Appointments extends MY_Controller
                 return $this->json_response(array(
                     'status' => FALSE,
                     'message' => 'Unable to update appointment at the moment.'
-                ), 500);
+                ));
             }
             $this->session->set_flashdata('error', 'Unable to update appointment at the moment.');
             redirect('admin/appointments/edit/' . (int) $id);
@@ -231,7 +233,7 @@ class Appointments extends MY_Controller
             return $this->json_response(array(
                 'status' => FALSE,
                 'message' => 'Invalid request method.'
-            ), 400);
+            ));
         }
 
         $status = trim((string) $this->input->post('status', TRUE));
@@ -241,7 +243,7 @@ class Appointments extends MY_Controller
             return $this->json_response(array(
                 'status' => FALSE,
                 'message' => 'Invalid appointment status.'
-            ), 422);
+            ));
         }
 
         $appointment = $this->Appointment_model->get_by_id((int) $id);
@@ -250,7 +252,7 @@ class Appointments extends MY_Controller
             return $this->json_response(array(
                 'status' => FALSE,
                 'message' => 'Appointment not found.'
-            ), 404);
+            ));
         }
 
         $updated = $this->Appointment_model->change_status((int) $id, $status);
@@ -259,7 +261,7 @@ class Appointments extends MY_Controller
             return $this->json_response(array(
                 'status' => FALSE,
                 'message' => 'Unable to update appointment status.'
-            ), 500);
+            ));
         }
 
         return $this->json_response(array(
@@ -283,19 +285,23 @@ class Appointments extends MY_Controller
 
         $result = $this->Appointment_model->get_filtered($filters, $per_page, $offset);
 
+        // Generate HTML for the table
+        $html = $this->load->view('admin/appointments/_table', array(
+            'appointments' => $result['rows']
+        ), TRUE);
+
         return $this->json_response(array(
             'status' => TRUE,
             'data' => $result['rows'],
-            'total' => $result['total'],
-            'page' => $page,
-            'per_page' => $per_page,
-            'total_pages' => (int) ceil($result['total'] / $per_page),
-            'html' => $this->load->view('admin/appointments/_table', array('appointments' => $result['rows']), TRUE)
+            'html' => $html,
+            'total' => (int) $result['total'],
+            'page' => (int) $page,
+            'per_page' => (int) $per_page,
+            'total_pages' => (int) ceil($result['total'] / $per_page)
         ));
     }
 
-
-    protected function validate_appointment_form($is_update = FALSE)
+    protected function validate_appointment_form()
     {
         $this->form_validation->set_rules('patient_id', 'Patient', 'trim|required|integer');
         $this->form_validation->set_rules('doctor_id', 'Doctor', 'trim|required|integer');
@@ -314,12 +320,11 @@ class Appointments extends MY_Controller
 
         if (!$this->Appointment_model->patient_exists($patient_id)) {
             $this->form_validation->set_message('patient_id', 'Please select a valid active patient.');
-            $this->session->set_flashdata('error', 'Please select a valid active patient.');
             return FALSE;
         }
 
         if (!$this->Appointment_model->doctor_exists($doctor_id)) {
-            $this->session->set_flashdata('error', 'Please select a valid active doctor.');
+            $this->form_validation->set_message('doctor_id', 'Please select a valid active doctor.');
             return FALSE;
         }
 
@@ -357,12 +362,5 @@ class Appointments extends MY_Controller
         return $errors;
     }
 
-    protected function json_response($response, $status_code = 200)
-    {
-        $response['csrfHash'] = $this->security->get_csrf_hash();
 
-        return $this->output
-            ->set_content_type('application/json')
-            ->set_output(json_encode($response));
-    }
 }

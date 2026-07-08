@@ -1,6 +1,10 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
 
+// Debug route - ADD THIS AT THE TOP OF YOUR ROUTES FILE
+$route['admin/doctors/update/(:num)'] = 'admin/admin_doctors/update/$1';
+$route['admin/doctors/edit/(:num)'] = 'admin/admin_doctors/edit/$1';
+
 $route['default_controller'] = 'auth';
 $route['404_override'] = '';
 $route['translate_uri_dashes'] = FALSE;
@@ -31,35 +35,58 @@ $route['patient/ajax/add'] = 'patient/patients/ajax_add';
 $route['patient/ajax/edit/(:num)'] = 'patient/patients/ajax_edit/$1';
 $route['patient/ajax/toggle/(:num)'] = 'patient/patients/ajax_toggle_status/$1';
 $route['patient/ajax/delete/(:num)'] = 'patient/patients/ajax_delete/$1';
-
 /*
 |--------------------------------------------------------------------------
 | Admin Patients
 |--------------------------------------------------------------------------
 */
 
-$route['admin/patients'] = 'admin/patients';
-$route['admin/patients/ajax-list'] = 'admin/patients/get_patients_ajax';
+$route['admin/patients'] = 'admin/patients/index';
+$route['admin/patients/get_patients_ajax'] = 'admin/patients/get_patients_ajax';
 $route['admin/patients/create'] = 'admin/patients/create';
 $route['admin/patients/store'] = 'admin/patients/store';
 $route['admin/patients/edit/(:num)'] = 'admin/patients/edit/$1';
 $route['admin/patients/update/(:num)'] = 'admin/patients/update/$1';
-$route['admin/patients/change-status/(:num)'] = 'admin/patients/change_status/$1';
+$route['admin/patients/change_status/(:num)'] = 'admin/patients/change_status/$1';
+
+
+/*
+|--------------------------------------------------------------------------
+| Admin Doctors (FIXED SECTION)
+|--------------------------------------------------------------------------
+*/
+
+// Direct URLs for admin_doctors controller - ADD THESE
+$route['admin/admin_doctors'] = 'admin/admin_doctors/index';
+$route['admin/admin_doctors/get_doctors_ajax'] = 'admin/admin_doctors/get_doctors_ajax';
+$route['admin/admin_doctors/get_setup_options'] = 'admin/admin_doctors/get_setup_options';
+$route['admin/admin_doctors/store'] = 'admin/admin_doctors/store';
+$route['admin/admin_doctors/edit/(:num)'] = 'admin/admin_doctors/edit/$1';
+$route['admin/admin_doctors/update/(:num)'] = 'admin/admin_doctors/update/$1';
+$route['admin/admin_doctors/change_status/(:num)'] = 'admin/admin_doctors/change_status/$1';
+
+// Shorter URLs for convenience (these already exist)
+$route['admin/doctors'] = 'admin/admin_doctors/index';
+$route['admin/doctors/get_doctors_ajax'] = 'admin/admin_doctors/get_doctors_ajax';
+$route['admin/doctors/get_setup_options'] = 'admin/admin_doctors/get_setup_options';
+$route['admin/doctors/store'] = 'admin/admin_doctors/store';
+$route['admin/doctors/edit/(:num)'] = 'admin/admin_doctors/edit/$1';
+$route['admin/doctors/update/(:num)'] = 'admin/admin_doctors/update/$1';
+$route['admin/doctors/change_status/(:num)'] = 'admin/admin_doctors/change_status/$1';
+
 
 /*
 |--------------------------------------------------------------------------
 | Admin Appointments
 |--------------------------------------------------------------------------
 */
-$route['admin/appointments'] = 'admin/appointments';
+$route['admin/appointments'] = 'admin/appointments/index';
 $route['admin/appointments/ajax-list'] = 'admin/appointments/get_appointments_ajax';
 $route['admin/appointments/create'] = 'admin/appointments/create';
 $route['admin/appointments/store'] = 'admin/appointments/store';
 $route['admin/appointments/edit/(:num)'] = 'admin/appointments/edit/$1';
 $route['admin/appointments/update/(:num)'] = 'admin/appointments/update/$1';
 $route['admin/appointments/change-status/(:num)'] = 'admin/appointments/change_status/$1';
-
-
 /*
 |--------------------------------------------------------------------------
 | Admin Lab
@@ -84,16 +111,16 @@ $route['admin/lab-requests/save-results/(:num)'] = 'admin/admin_lab/save_results
 
 /*
 |--------------------------------------------------------------------------
-| Medicines
+| Admin Medicines (FIXED)
 |--------------------------------------------------------------------------
 */
 
-$route['admin/medicines'] = 'admin/admin_prescriptions/medicines';
-$route['admin/medicines/ajax-list'] = 'admin/admin_prescriptions/get_medicines_ajax';
-$route['admin/medicines/store'] = 'admin/admin_prescriptions/store_medicine';
-$route['admin/medicines/edit/(:num)'] = 'admin/admin_prescriptions/edit_medicine/$1';
-$route['admin/medicines/update/(:num)'] = 'admin/admin_prescriptions/update_medicine/$1';
-$route['admin/medicines/change-status/(:num)'] = 'admin/admin_prescriptions/change_medicine_status/$1';
+$route['admin/medicines'] = 'admin/admin_medicines/index';
+$route['admin/medicines/ajax-list'] = 'admin/admin_medicines/get_medicines_ajax';
+$route['admin/medicines/store'] = 'admin/admin_medicines/store';
+$route['admin/medicines/edit/(:num)'] = 'admin/admin_medicines/edit/$1';
+$route['admin/medicines/update/(:num)'] = 'admin/admin_medicines/update/$1';
+$route['admin/medicines/change-status/(:num)'] = 'admin/admin_medicines/change_status/$1';
 
 /*
 |--------------------------------------------------------------------------
@@ -105,18 +132,17 @@ $route['admin/prescriptions'] = 'admin/admin_prescriptions/index';
 $route['admin/prescriptions/ajax-list'] = 'admin/admin_prescriptions/get_prescriptions_ajax';
 $route['admin/prescriptions/create'] = 'admin/admin_prescriptions/create';
 $route['admin/prescriptions/store'] = 'admin/admin_prescriptions/store';
-
 /*
 |--------------------------------------------------------------------------
-| Pharmacy Billing
+| Admin Pharmacy Billing
 |--------------------------------------------------------------------------
 */
-
 $route['admin/pharmacy-billing'] = 'admin/admin_pharmacy/index';
 $route['admin/pharmacy-billing/ajax-list'] = 'admin/admin_pharmacy/get_bills_ajax';
 $route['admin/pharmacy-billing/create'] = 'admin/admin_pharmacy/create';
+$route['admin/pharmacy-billing/create/(:num)'] = 'admin/admin_pharmacy/create/$1';
+$route['admin/pharmacy-billing/prescription/(:num)'] = 'admin/admin_pharmacy/get_prescription_ajax/$1';
 $route['admin/pharmacy-billing/store'] = 'admin/admin_pharmacy/store';
-
 /*
 |--------------------------------------------------------------------------
 | Billing

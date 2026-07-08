@@ -2,13 +2,12 @@
 
 <?php
 $is_edit = isset($appointment) && !empty($appointment);
-$action = $is_edit ? 'admin/appointments/update/' . (int) $appointment['id'] : 'admin/appointments/store';
-$form_class = $is_edit ? 'js-edit-appointment-form' : 'js-create-appointment-form';
+$action = $is_edit ? site_url('admin/appointments/update/' . (int) $appointment['id']) : site_url('admin/appointments/store');
 $form_id = $is_edit ? 'editAppointmentForm' : 'createAppointmentForm';
 $is_modal = isset($is_modal) && $is_modal;
 ?>
 
-<?php echo form_open($action, array('autocomplete' => 'off', 'class' => $form_class, 'id' => $form_id)); ?>
+<?php echo form_open($action, array('autocomplete' => 'off', 'id' => $form_id)); ?>
     <div class="card-body">
         <?php if ($is_edit): ?>
             <div class="alert alert-light border">
@@ -25,8 +24,8 @@ $is_modal = isset($is_modal) && $is_modal;
         <div class="row">
             <div class="col-md-6">
                 <div class="form-group">
-                    <label for="<?php echo $is_edit ? 'edit_' : ''; ?>patient_id">Patient <span class="text-danger">*</span></label>
-                    <select class="form-control" id="<?php echo $is_edit ? 'edit_' : ''; ?>patient_id" name="patient_id">
+                    <label for="patient_id">Patient <span class="text-danger">*</span></label>
+                    <select class="form-control" id="patient_id" name="patient_id">
                         <option value="">Select Patient</option>
                         <?php foreach ($patients as $patient): ?>
                             <option value="<?php echo (int) $patient['id']; ?>" <?php echo set_select('patient_id', (string) $patient['id'], $is_edit ? (int) $appointment['patient_id'] === (int) $patient['id'] : FALSE); ?>>
@@ -40,8 +39,8 @@ $is_modal = isset($is_modal) && $is_modal;
 
             <div class="col-md-6">
                 <div class="form-group">
-                    <label for="<?php echo $is_edit ? 'edit_' : ''; ?>doctor_id">Doctor <span class="text-danger">*</span></label>
-                    <select class="form-control" id="<?php echo $is_edit ? 'edit_' : ''; ?>doctor_id" name="doctor_id">
+                    <label for="doctor_id">Doctor <span class="text-danger">*</span></label>
+                    <select class="form-control" id="doctor_id" name="doctor_id">
                         <option value="">Select Doctor</option>
                         <?php foreach ($doctors as $doctor): ?>
                             <?php
@@ -60,24 +59,24 @@ $is_modal = isset($is_modal) && $is_modal;
         <div class="row">
             <div class="col-md-3">
                 <div class="form-group">
-                    <label for="<?php echo $is_edit ? 'edit_' : ''; ?>appointment_date">Appointment Date <span class="text-danger">*</span></label>
-                    <input type="date" class="form-control" id="<?php echo $is_edit ? 'edit_' : ''; ?>appointment_date" name="appointment_date" value="<?php echo html_escape(set_value('appointment_date', $is_edit ? $appointment['appointment_date'] : '')); ?>">
+                    <label for="appointment_date">Appointment Date <span class="text-danger">*</span></label>
+                    <input type="date" class="form-control" id="appointment_date" name="appointment_date" value="<?php echo html_escape(set_value('appointment_date', $is_edit ? $appointment['appointment_date'] : '')); ?>">
                     <?php echo form_error('appointment_date'); ?>
                 </div>
             </div>
 
             <div class="col-md-3">
                 <div class="form-group">
-                    <label for="<?php echo $is_edit ? 'edit_' : ''; ?>appointment_time">Appointment Time <span class="text-danger">*</span></label>
-                    <input type="time" class="form-control" id="<?php echo $is_edit ? 'edit_' : ''; ?>appointment_time" name="appointment_time" value="<?php echo html_escape(set_value('appointment_time', $is_edit ? $appointment['appointment_time'] : '')); ?>">
+                    <label for="appointment_time">Appointment Time <span class="text-danger">*</span></label>
+                    <input type="time" class="form-control" id="appointment_time" name="appointment_time" value="<?php echo html_escape(set_value('appointment_time', $is_edit ? $appointment['appointment_time'] : '')); ?>">
                     <?php echo form_error('appointment_time'); ?>
                 </div>
             </div>
 
             <div class="col-md-3">
                 <div class="form-group">
-                    <label for="<?php echo $is_edit ? 'edit_' : ''; ?>status">Status <span class="text-danger">*</span></label>
-                    <select class="form-control" id="<?php echo $is_edit ? 'edit_' : ''; ?>status" name="status">
+                    <label for="status">Status <span class="text-danger">*</span></label>
+                    <select class="form-control" id="status" name="status">
                         <option value="scheduled" <?php echo set_select('status', 'scheduled', $is_edit ? $appointment['status'] === 'scheduled' : TRUE); ?>>Scheduled</option>
                         <option value="completed" <?php echo set_select('status', 'completed', $is_edit ? $appointment['status'] === 'completed' : FALSE); ?>>Completed</option>
                         <option value="cancelled" <?php echo set_select('status', 'cancelled', $is_edit ? $appointment['status'] === 'cancelled' : FALSE); ?>>Cancelled</option>
@@ -88,16 +87,16 @@ $is_modal = isset($is_modal) && $is_modal;
 
             <div class="col-md-3">
                 <div class="form-group">
-                    <label for="<?php echo $is_edit ? 'edit_' : ''; ?>reason">Reason</label>
-                    <input type="text" class="form-control" id="<?php echo $is_edit ? 'edit_' : ''; ?>reason" name="reason" value="<?php echo html_escape(set_value('reason', $is_edit ? $appointment['reason'] : '')); ?>" maxlength="255">
+                    <label for="reason">Reason</label>
+                    <input type="text" class="form-control" id="reason" name="reason" value="<?php echo html_escape(set_value('reason', $is_edit ? $appointment['reason'] : '')); ?>" maxlength="255">
                     <?php echo form_error('reason'); ?>
                 </div>
             </div>
         </div>
 
         <div class="form-group mb-0">
-            <label for="<?php echo $is_edit ? 'edit_' : ''; ?>notes">Notes</label>
-            <textarea class="form-control" id="<?php echo $is_edit ? 'edit_' : ''; ?>notes" name="notes" rows="4"><?php echo html_escape(set_value('notes', $is_edit ? $appointment['notes'] : '')); ?></textarea>
+            <label for="notes">Notes</label>
+            <textarea class="form-control" id="notes" name="notes" rows="4"><?php echo html_escape(set_value('notes', $is_edit ? $appointment['notes'] : '')); ?></textarea>
             <?php echo form_error('notes'); ?>
         </div>
     </div>
