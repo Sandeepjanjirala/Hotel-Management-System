@@ -20,6 +20,17 @@
 
     <section class="content">
         <div class="container-fluid hms-dashboard">
+            <div class="hms-dashboard-hero">
+                <div>
+                    <span class="hms-eyebrow"><i class="fas fa-circle"></i> SYSTEM OVERVIEW</span>
+                    <h2>Run every part of your hospital with clarity.</h2>
+                    <p>Monitor operations, coordinate care teams, and access essential workflows from one secure workspace.</p>
+                </div>
+                <div class="hms-hero-actions">
+                    <a href="<?php echo site_url('admin/appointments/create'); ?>" class="hms-hero-primary"><i class="fas fa-plus"></i> New appointment</a>
+                    <a href="<?php echo site_url('admin/patients'); ?>" class="hms-hero-secondary"><i class="fas fa-users"></i> Patient workspace</a>
+                </div>
+            </div>
             <div class="row">
                 <div class="col-xl-2 col-lg-4 col-md-6 col-sm-6">
                     <div class="hms-stat-card">

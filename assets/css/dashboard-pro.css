@@ -1,15 +1,15 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
 :root {
-  --hms-body-bg: #f4f7fb;
+  --hms-body-bg: #f5f7fb;
   --hms-surface: #ffffff;
   --hms-surface-alt: #f8fafc;
   --hms-border: #dbe4ee;
   --hms-border-strong: #c7d3e0;
   --hms-text: #16324f;
   --hms-text-muted: #6d8097;
-  --hms-sidebar-bg: #10243a;
-  --hms-sidebar-bg-alt: #162d47;
+  --hms-sidebar-bg: #0c1d35;
+  --hms-sidebar-bg-alt: #102946;
   --hms-sidebar-text: rgba(235, 242, 250, 0.84);
   --hms-sidebar-muted: rgba(188, 203, 220, 0.66);
   --hms-sidebar-active: #1c6fd1;
@@ -45,11 +45,11 @@ body.hms-admin-shell {
 }
 
 .hms-admin-shell .main-header.navbar {
-  min-height: 68px;
+  min-height: 72px;
   padding: 0 1.25rem;
   background: #ffffff;
   border-bottom: 1px solid var(--hms-border);
-  box-shadow: 0 2px 8px rgba(16, 36, 58, 0.04);
+  box-shadow: 0 4px 16px rgba(16, 36, 58, 0.04);
 }
 
 .hms-admin-navbar {
@@ -71,6 +71,45 @@ body.hms-admin-shell {
   background: var(--hms-accent-soft);
   color: var(--hms-accent) !important;
 }
+
+.hms-navbar-context {
+  align-items: center;
+  gap: 12px;
+  margin-left: 12px;
+  color: var(--hms-text-muted);
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+
+.hms-context-label { color: var(--hms-accent); font-size: 0.7rem; letter-spacing: 0.09em; }
+.hms-context-divider { width: 1px; height: 20px; background: var(--hms-border); }
+
+.hms-patient-menu {
+  margin-right: 18px;
+  position: relative;
+  right: 72px;
+}
+.hms-patient-menu-toggle {
+  display: flex !important; align-items: center; gap: 9px; min-height: 46px;
+  padding: 5px 12px !important; border: 1px solid var(--hms-border); border-radius: 12px;
+  color: var(--hms-text) !important; background: var(--hms-surface); transition: all .18s ease;
+}
+.hms-patient-menu-toggle:hover, .hms-patient-menu-toggle.is-active { border-color: #b8d5f3; background: #f1f8ff; color: var(--hms-accent) !important; }
+.hms-patient-menu-icon { width: 30px; height: 30px; display: inline-flex; align-items: center; justify-content: center; border-radius: 9px; background: #e8f3ff; color: var(--hms-accent); }
+.hms-patient-menu-copy { display: flex; flex-direction: column; line-height: 1.2; font-size: .81rem; font-weight: 700; }
+.hms-patient-menu-copy small { color: var(--hms-text-muted); font-size: .62rem; letter-spacing: .08em; font-weight: 700; }
+.hms-patient-menu-chevron { font-size: .65rem; color: var(--hms-text-muted); }
+.hms-patient-dropdown { min-width: 300px; margin-top: 10px; padding: 8px; border: 1px solid var(--hms-border); border-radius: 14px; box-shadow: 0 18px 38px rgba(16, 36, 58, .15); }
+.hms-patient-dropdown-head { display: flex; align-items: center; gap: 10px; padding: 12px 10px 14px; border-bottom: 1px solid #edf2f7; }
+.hms-patient-dropdown-head strong, .hms-patient-dropdown-head small { display: block; }
+.hms-patient-dropdown-head strong { color: var(--hms-text); font-size: .92rem; }
+.hms-patient-dropdown-head small { color: var(--hms-text-muted); font-size: .74rem; margin-top: 2px; }
+.hms-patient-dropdown .dropdown-item { display: flex; align-items: center; gap: 12px; margin-top: 4px; padding: 11px 10px; border-radius: 10px; color: var(--hms-text); }
+.hms-patient-dropdown .dropdown-item > i { width: 30px; color: var(--hms-accent); text-align: center; }
+.hms-patient-dropdown .dropdown-item span, .hms-patient-dropdown .dropdown-item strong, .hms-patient-dropdown .dropdown-item small { display: block; }
+.hms-patient-dropdown .dropdown-item strong { font-size: .86rem; }
+.hms-patient-dropdown .dropdown-item small { margin-top: 2px; color: var(--hms-text-muted); font-size: .72rem; }
+.hms-patient-dropdown .dropdown-item:hover, .hms-patient-dropdown .dropdown-item.active { background: #f0f7ff; color: var(--hms-accent); }
 
 .hms-navbar-user {
   display: flex;
@@ -201,7 +240,71 @@ body.hms-admin-shell {
 }
 
 .hms-sidebar-nav {
-  padding: 8px 10px 18px;
+  padding: 10px 10px 18px;
+}
+
+.hms-nav-section { padding: 14px 14px 7px; color: var(--hms-sidebar-muted); font-size: .65rem; font-weight: 700; letter-spacing: .12em; list-style: none; }
+
+/* Keep the compact rail deliberately icon-only; no labels may be clipped. */
+body.hms-admin-shell.sidebar-collapse .hms-nav-section {
+  display: none;
+}
+
+body.hms-admin-shell.sidebar-collapse .hms-user-panel {
+  width: 56px;
+  height: 56px;
+  min-height: 56px;
+  margin: 14px auto 16px;
+  padding: 5px !important;
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  overflow: visible;
+  border: 1px solid rgba(150, 206, 255, .22);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, .09);
+}
+
+body.hms-admin-shell.sidebar-collapse .hms-user-panel .image {
+  margin: 0;
+}
+
+body.hms-admin-shell.sidebar-collapse .hms-user-panel .info {
+  display: none;
+}
+
+body.hms-admin-shell.sidebar-collapse .hms-user-avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, #2c8ee6, #1665b9);
+  border: 1px solid rgba(255, 255, 255, .24);
+  box-shadow: 0 7px 16px rgba(7, 54, 104, .4);
+}
+
+body.hms-admin-shell.sidebar-collapse .hms-sidebar-nav {
+  padding: 18px 10px;
+}
+
+body.hms-admin-shell.sidebar-collapse .nav-sidebar > .nav-item {
+  margin-bottom: 8px;
+}
+
+body.hms-admin-shell.sidebar-collapse .nav-sidebar > .nav-item > .nav-link {
+  justify-content: center;
+  padding: 12px;
+}
+
+body.hms-admin-shell.sidebar-collapse .nav-sidebar > .nav-item > .nav-link > p,
+body.hms-admin-shell.sidebar-collapse .nav-sidebar > .nav-item > .nav-link > .right,
+body.hms-admin-shell.sidebar-collapse .nav-sidebar > .nav-item > .nav-treeview {
+  display: none;
+}
+
+body.hms-admin-shell.sidebar-collapse .nav-sidebar > .nav-item > .nav-link .nav-icon {
+  width: auto;
+  min-width: 0;
+  margin-right: 0;
 }
 
 .hms-admin-shell .nav-sidebar > .nav-item {
@@ -296,7 +399,7 @@ body.hms-admin-shell {
 }
 
 .hms-page-header {
-  padding: 22px 0 10px;
+  padding: 26px 0 14px;
 }
 
 .hms-page-header h1 {
@@ -330,6 +433,21 @@ body.hms-admin-shell {
 .hms-dashboard {
   padding: 0 4px 20px;
 }
+
+.hms-dashboard-hero { display: flex; align-items: center; justify-content: space-between; gap: 28px; margin: 0 0 22px; padding: 28px 30px; color: #fff; border-radius: 18px; overflow: hidden; position: relative; background: radial-gradient(circle at 84% 24%, rgba(55, 151, 255, .42), transparent 27%), linear-gradient(120deg, #0e2946 0%, #114f86 100%); box-shadow: 0 14px 28px rgba(16, 56, 94, .17); }
+.hms-dashboard-hero:after { content: ''; position: absolute; width: 210px; height: 210px; right: 23%; bottom: -150px; border: 34px solid rgba(255,255,255,.07); border-radius: 50%; }
+.hms-dashboard-hero > * { position: relative; z-index: 1; }
+.hms-eyebrow { display: block; margin-bottom: 10px; color: #a9d9ff; font-size: .68rem; font-weight: 700; letter-spacing: .12em; }
+.hms-eyebrow i { margin-right: 6px; font-size: .46rem; vertical-align: 1px; color: #63d9a5; }
+.hms-dashboard-hero h2 { max-width: 650px; margin: 0 0 8px; color: #fff; font-size: 1.65rem; font-weight: 700; }
+.hms-dashboard-hero p { max-width: 700px; margin: 0; color: rgba(234,246,255,.8); font-size: .91rem; }
+.hms-hero-actions { display: flex; flex-shrink: 0; gap: 10px; }
+.hms-hero-actions a { display: inline-flex; align-items: center; gap: 8px; min-height: 42px; padding: 0 14px; border-radius: 10px; font-size: .82rem; font-weight: 700; white-space: nowrap; transition: transform .18s ease, background .18s ease; }
+.hms-hero-actions a:hover { transform: translateY(-1px); }
+.hms-hero-primary { background: #fff; color: #13548b; }
+.hms-hero-primary:hover { color: #0a3860; background: #edf8ff; }
+.hms-hero-secondary { border: 1px solid rgba(255,255,255,.32); color: #fff; }
+.hms-hero-secondary:hover { color: #fff; background: rgba(255,255,255,.12); }
 
 .hms-stat-card,
 .hms-mini-stat,
@@ -489,6 +607,8 @@ body.hms-admin-shell {
   .hms-navbar-user-meta {
     display: none;
   }
+
+  .hms-dashboard-hero { align-items: flex-start; flex-direction: column; }
 }
 
 @media (max-width: 767.98px) {
@@ -503,6 +623,14 @@ body.hms-admin-shell {
   .hms-logout-link span {
     display: none;
   }
+
+  .hms-patient-menu { right: auto; margin-right: 6px; }
+  .hms-patient-menu-toggle { padding: 5px 8px !important; }
+  .hms-patient-menu-copy, .hms-patient-menu-chevron { display: none; }
+  .hms-patient-dropdown { min-width: 276px; }
+  .hms-dashboard-hero { padding: 23px 20px; }
+  .hms-dashboard-hero h2 { font-size: 1.4rem; }
+  .hms-hero-actions { width: 100%; flex-wrap: wrap; }
 
   .hms-page-header {
     padding: 18px 0 8px;

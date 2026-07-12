@@ -30,15 +30,6 @@ if ($sidebar_role === 'admin') {
             )
         ),
         array(
-            'label' => 'Patient Management',
-            'icon' => 'fas fa-bed-pulse',
-            'menus' => array('patients', 'appointments'),
-            'items' => array(
-                array('label' => 'Patients', 'uri' => 'admin/patients', 'menu' => 'patients'),
-                array('label' => 'Appointments', 'uri' => 'admin/appointments', 'menu' => 'appointments')
-            )
-        ),
-        array(
             'label' => 'Clinical Management',
             'icon' => 'fas fa-stethoscope',
             'menus' => array('prescriptions', 'lab_requests', 'lab_tests'),
@@ -69,15 +60,6 @@ if ($sidebar_role === 'admin') {
 } elseif ($sidebar_role === 'doctor') {
     $menu_groups = array(
         array(
-            'label' => 'Patient Management',
-            'icon' => 'fas fa-bed-pulse',
-            'menus' => array('patients', 'appointments'),
-            'items' => array(
-                array('label' => 'Patients', 'uri' => 'doctor/patients', 'menu' => 'patients'),
-                array('label' => 'Appointments', 'uri' => 'doctor/appointments', 'menu' => 'appointments')
-            )
-        ),
-        array(
             'label' => 'Clinical Management',
             'icon' => 'fas fa-stethoscope',
             'menus' => array('prescriptions', 'lab_requests'),
@@ -89,15 +71,6 @@ if ($sidebar_role === 'admin') {
     );
 } else {
     $menu_groups = array(
-        array(
-            'label' => 'Patient Management',
-            'icon' => 'fas fa-bed-pulse',
-            'menus' => array('patients', 'appointments'),
-            'items' => array(
-                array('label' => 'Patients', 'uri' => 'receptionist/patients', 'menu' => 'patients'),
-                array('label' => 'Appointments', 'uri' => 'receptionist/appointments', 'menu' => 'appointments')
-            )
-        ),
         array(
             'label' => 'Pharmacy',
             'icon' => 'fas fa-capsules',
@@ -144,17 +117,19 @@ if ($sidebar_role === 'admin') {
 
         <nav class="mt-2">
             <ul class="nav nav-pills nav-sidebar flex-column hms-sidebar-nav" data-widget="treeview" role="menu" data-accordion="false">
+                <li class="hms-nav-section">WORKSPACE</li>
                 <li class="nav-item">
-                    <a href="<?php echo $home_url; ?>" class="nav-link <?php echo ($active_menu === 'dashboard') ? 'active' : ''; ?>">
+                    <a href="<?php echo $home_url; ?>" class="nav-link <?php echo ($active_menu === 'dashboard') ? 'active' : ''; ?>" title="Dashboard">
                         <i class="nav-icon fas fa-chart-pie"></i>
                         <p>Dashboard</p>
                     </a>
                 </li>
 
+                <li class="hms-nav-section">OPERATIONS</li>
                 <?php foreach ($menu_groups as $group): ?>
                     <?php $group_active = in_array($active_menu, $group['menus'], true); ?>
                     <li class="nav-item has-treeview <?php echo $group_active ? 'menu-open' : ''; ?>">
-                        <a href="#" class="nav-link hms-group-link <?php echo $group_active ? 'active' : ''; ?>">
+                        <a href="#" class="nav-link hms-group-link <?php echo $group_active ? 'active' : ''; ?>" title="<?php echo html_escape($group['label']); ?>">
                             <i class="nav-icon <?php echo html_escape($group['icon']); ?>"></i>
                             <p>
                                 <?php echo html_escape($group['label']); ?>

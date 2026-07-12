@@ -41,5 +41,5 @@
         }
     </style>
 </head>
-<body class="hold-transition sidebar-mini layout-fixed layout-navbar-fixed hms-admin-shell">
+<body class="hold-transition sidebar-mini  layout-fixed layout-navbar-fixed hms-admin-shell">
 <div class="wrapper">
