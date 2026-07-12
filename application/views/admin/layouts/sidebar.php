@@ -8,24 +8,128 @@ if ($sidebar_role === 'admin') {
     $home_url = site_url('admin');
     $brand_suffix = 'Admin';
 } elseif ($sidebar_role === 'doctor') {
-    $home_url = site_url('admin/prescriptions');
+    $home_url = site_url('doctor');
     $brand_suffix = 'Doctor';
 } else {
-    $home_url = site_url('admin/patients');
+    $home_url = site_url('receptionist');
     $brand_suffix = 'Reception';
 }
+
+$menu_groups = array();
+
+if ($sidebar_role === 'admin') {
+    $menu_groups = array(
+        array(
+            'label' => 'Hospital Management',
+            'icon' => 'fas fa-hospital',
+            'menus' => array('departments', 'users', 'doctors'),
+            'items' => array(
+                array('label' => 'Departments', 'uri' => 'admin/departments', 'menu' => 'departments'),
+                array('label' => 'Users', 'uri' => 'admin/users', 'menu' => 'users'),
+                array('label' => 'Doctors', 'uri' => 'admin/doctors', 'menu' => 'doctors')
+            )
+        ),
+        array(
+            'label' => 'Patient Management',
+            'icon' => 'fas fa-bed-pulse',
+            'menus' => array('patients', 'appointments'),
+            'items' => array(
+                array('label' => 'Patients', 'uri' => 'admin/patients', 'menu' => 'patients'),
+                array('label' => 'Appointments', 'uri' => 'admin/appointments', 'menu' => 'appointments')
+            )
+        ),
+        array(
+            'label' => 'Clinical Management',
+            'icon' => 'fas fa-stethoscope',
+            'menus' => array('prescriptions', 'lab_requests', 'lab_tests'),
+            'items' => array(
+                array('label' => 'Prescriptions', 'uri' => 'admin/prescriptions', 'menu' => 'prescriptions'),
+                array('label' => 'Lab Requests', 'uri' => 'admin/lab-requests', 'menu' => 'lab_requests'),
+                array('label' => 'Lab Tests', 'uri' => 'admin/lab-tests', 'menu' => 'lab_tests')
+            )
+        ),
+        array(
+            'label' => 'Pharmacy',
+            'icon' => 'fas fa-capsules',
+            'menus' => array('medicines', 'pharmacy_billing'),
+            'items' => array(
+                array('label' => 'Medicines', 'uri' => 'admin/medicines', 'menu' => 'medicines'),
+                array('label' => 'Pharmacy Billing', 'uri' => 'admin/pharmacy-billing', 'menu' => 'pharmacy_billing')
+            )
+        ),
+        array(
+            'label' => 'Finance',
+            'icon' => 'fas fa-coins',
+            'menus' => array('billing'),
+            'items' => array(
+                array('label' => 'Billing', 'uri' => 'admin/billing', 'menu' => 'billing')
+            )
+        )
+    );
+} elseif ($sidebar_role === 'doctor') {
+    $menu_groups = array(
+        array(
+            'label' => 'Patient Management',
+            'icon' => 'fas fa-bed-pulse',
+            'menus' => array('patients', 'appointments'),
+            'items' => array(
+                array('label' => 'Patients', 'uri' => 'doctor/patients', 'menu' => 'patients'),
+                array('label' => 'Appointments', 'uri' => 'doctor/appointments', 'menu' => 'appointments')
+            )
+        ),
+        array(
+            'label' => 'Clinical Management',
+            'icon' => 'fas fa-stethoscope',
+            'menus' => array('prescriptions', 'lab_requests'),
+            'items' => array(
+                array('label' => 'Prescriptions', 'uri' => 'doctor/appointments', 'menu' => 'prescriptions'),
+                array('label' => 'Lab Requests', 'uri' => 'doctor/appointments', 'menu' => 'lab_requests')
+            )
+        )
+    );
+} else {
+    $menu_groups = array(
+        array(
+            'label' => 'Patient Management',
+            'icon' => 'fas fa-bed-pulse',
+            'menus' => array('patients', 'appointments'),
+            'items' => array(
+                array('label' => 'Patients', 'uri' => 'receptionist/patients', 'menu' => 'patients'),
+                array('label' => 'Appointments', 'uri' => 'receptionist/appointments', 'menu' => 'appointments')
+            )
+        ),
+        array(
+            'label' => 'Pharmacy',
+            'icon' => 'fas fa-capsules',
+            'menus' => array('pharmacy', 'pharmacy_billing'),
+            'items' => array(
+                array('label' => 'Pharmacy Billing', 'uri' => 'receptionist/pharmacy-billing', 'menu' => 'pharmacy')
+            )
+        ),
+        array(
+            'label' => 'Finance',
+            'icon' => 'fas fa-coins',
+            'menus' => array('billing'),
+            'items' => array(
+                array('label' => 'Billing', 'uri' => 'receptionist/billing', 'menu' => 'billing')
+            )
+        )
+    );
+}
 ?>
-<aside class="main-sidebar sidebar-dark-primary elevation-4">
-    <a href="<?php echo $home_url; ?>" class="brand-link">
-        <i class="fas fa-hospital-symbol brand-image img-circle elevation-3"></i>
+<aside class="main-sidebar sidebar-dark-primary elevation-4 hms-nav-sidebar">
+    <a href="<?php echo $home_url; ?>" class="brand-link hms-brand-link">
+        <span class="hms-brand-mark">
+            <i class="fas fa-hospital-symbol"></i>
+        </span>
         <span class="brand-text font-weight-light">HMS <?php echo html_escape($brand_suffix); ?></span>
     </a>
 
     <div class="sidebar">
-        <div class="user-panel mt-3 pb-3 mb-3 d-flex">
+        <div class="user-panel mt-3 pb-3 mb-3 d-flex hms-user-panel">
             <div class="image">
-                <div class="img-circle elevation-2 bg-info d-flex align-items-center justify-content-center" style="width: 34px; height: 34px;">
-                    <i class="fas fa-user text-white"></i>
+                <div class="hms-user-avatar">
+                    <i class="fas fa-user"></i>
                 </div>
             </div>
             <div class="info">
@@ -39,98 +143,36 @@ if ($sidebar_role === 'admin') {
         </div>
 
         <nav class="mt-2">
-            <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
-                <?php if ($sidebar_role === 'admin'): ?>
-                    <li class="nav-item">
-                        <a href="<?php echo site_url('admin'); ?>" class="nav-link <?php echo ($active_menu === 'dashboard') ? 'active' : ''; ?>">
-                            <i class="nav-icon fas fa-tachometer-alt"></i>
-                            <p>Dashboard</p>
-                        </a>
-                    </li>
+            <ul class="nav nav-pills nav-sidebar flex-column hms-sidebar-nav" data-widget="treeview" role="menu" data-accordion="false">
+                <li class="nav-item">
+                    <a href="<?php echo $home_url; ?>" class="nav-link <?php echo ($active_menu === 'dashboard') ? 'active' : ''; ?>">
+                        <i class="nav-icon fas fa-chart-pie"></i>
+                        <p>Dashboard</p>
+                    </a>
+                </li>
 
-                    <li class="nav-item">
-                        <a href="<?php echo site_url('admin/departments'); ?>" class="nav-link <?php echo ($active_menu === 'departments') ? 'active' : ''; ?>">
-                            <i class="nav-icon fas fa-building"></i>
-                            <p>Departments</p>
+                <?php foreach ($menu_groups as $group): ?>
+                    <?php $group_active = in_array($active_menu, $group['menus'], true); ?>
+                    <li class="nav-item has-treeview <?php echo $group_active ? 'menu-open' : ''; ?>">
+                        <a href="#" class="nav-link hms-group-link <?php echo $group_active ? 'active' : ''; ?>">
+                            <i class="nav-icon <?php echo html_escape($group['icon']); ?>"></i>
+                            <p>
+                                <?php echo html_escape($group['label']); ?>
+                                <i class="right fas fa-angle-right"></i>
+                            </p>
                         </a>
+                        <ul class="nav nav-treeview hms-nav-children">
+                            <?php foreach ($group['items'] as $item): ?>
+                                <li class="nav-item">
+                                    <a href="<?php echo site_url($item['uri']); ?>" class="nav-link <?php echo ($active_menu === $item['menu']) ? 'active' : ''; ?>">
+                                        <i class="far fa-circle nav-icon"></i>
+                                        <p><?php echo html_escape($item['label']); ?></p>
+                                    </a>
+                                </li>
+                            <?php endforeach; ?>
+                        </ul>
                     </li>
-
-                    <li class="nav-item">
-                        <a href="<?php echo site_url('admin/users'); ?>" class="nav-link <?php echo ($active_menu === 'users') ? 'active' : ''; ?>">
-                            <i class="nav-icon fas fa-users-cog"></i>
-                            <p>Users</p>
-                        </a>
-                    </li>
-
-                    <li class="nav-item">
-                        <a href="<?php echo site_url('admin/doctors'); ?>" class="nav-link <?php echo ($active_menu === 'doctors') ? 'active' : ''; ?>">
-                            <i class="nav-icon fas fa-user-md"></i>
-                            <p>Doctors</p>
-                        </a>
-                    </li>
-
-                    <li class="nav-item">
-                        <a href="<?php echo site_url('admin/medicines'); ?>" class="nav-link <?php echo ($active_menu === 'medicines') ? 'active' : ''; ?>">
-                            <i class="nav-icon fas fa-capsules"></i>
-                            <p>Medicines</p>
-                        </a>
-                    </li>
-
-                    <li class="nav-item">
-                        <a href="<?php echo site_url('admin/lab-tests'); ?>" class="nav-link <?php echo ($active_menu === 'lab_tests') ? 'active' : ''; ?>">
-                            <i class="nav-icon fas fa-vials"></i>
-                            <p>Lab Tests</p>
-                        </a>
-                    </li>
-                <?php endif; ?>
-
-                <?php if ($sidebar_role === 'admin' || $sidebar_role === 'receptionist'): ?>
-                    <li class="nav-item">
-                        <a href="<?php echo site_url('admin/patients'); ?>" class="nav-link <?php echo ($active_menu === 'patients') ? 'active' : ''; ?>">
-                            <i class="nav-icon fas fa-procedures"></i>
-                            <p>Patients</p>
-                        </a>
-                    </li>
-
-                    <li class="nav-item">
-                        <a href="<?php echo site_url('admin/appointments'); ?>" class="nav-link <?php echo ($active_menu === 'appointments') ? 'active' : ''; ?>">
-                            <i class="nav-icon fas fa-calendar-check"></i>
-                            <p>Appointments</p>
-                        </a>
-                    </li>
-
-                    <li class="nav-item">
-                        <a href="<?php echo site_url('admin/pharmacy-billing'); ?>" class="nav-link <?php echo ($active_menu === 'pharmacy_billing') ? 'active' : ''; ?>">
-                            <i class="nav-icon fas fa-file-medical-alt"></i>
-                            <p>Pharmacy Billing</p>
-                        </a>
-                    </li>
-
-                    <li class="nav-item">
-                        <a href="<?php echo site_url('admin/billing'); ?>" class="nav-link <?php echo ($active_menu === 'billing') ? 'active' : ''; ?>">
-                            <i class="nav-icon fas fa-file-invoice-dollar"></i>
-                            <p>Billing</p>
-                        </a>
-                    </li>
-                <?php endif; ?>
-
-                <?php if ($sidebar_role === 'admin' || $sidebar_role === 'doctor'): ?>
-                    <li class="nav-item">
-                        <a href="<?php echo site_url('admin/prescriptions'); ?>" class="nav-link <?php echo ($active_menu === 'prescriptions') ? 'active' : ''; ?>">
-                            <i class="nav-icon fas fa-prescription"></i>
-                            <p>Prescriptions</p>
-                        </a>
-                    </li>
-                <?php endif; ?>
-
-                <?php if ($sidebar_role === 'admin' || $sidebar_role === 'doctor' || $sidebar_role === 'receptionist'): ?>
-                    <li class="nav-item">
-                        <a href="<?php echo site_url('admin/lab-requests'); ?>" class="nav-link <?php echo ($active_menu === 'lab_requests') ? 'active' : ''; ?>">
-                            <i class="nav-icon fas fa-flask"></i>
-                            <p>Lab Requests</p>
-                        </a>
-                    </li>
-                <?php endif; ?>
+                <?php endforeach; ?>
             </ul>
         </nav>
     </div>

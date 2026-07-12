@@ -1,8 +1,10 @@
 <?php defined('BASEPATH') OR exit('No direct script access allowed'); ?>
-<footer class="main-footer">
-    <strong>&copy; <?php echo date('Y'); ?> Hospital Management System.</strong>
-    <div class="float-right d-none d-sm-inline-block">
-        Admin Dashboard Foundation
+<footer class="main-footer hms-admin-footer">
+    <div class="hms-footer-left">
+        <strong>&copy; <?php echo date('Y'); ?> Hospital Management System</strong>
+    </div>
+    <div class="hms-footer-right d-none d-sm-inline-block">
+        Admin Console
     </div>
 </footer>
 

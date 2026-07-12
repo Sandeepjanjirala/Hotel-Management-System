@@ -1,0 +1,325 @@
+/* ==========================================================================
+   HMS Admin Dashboard — Professional theme
+   Scope: everything lives under .hms-dashboard so it is safe to include
+   sitewide without disturbing other AdminLTE pages/components.
+   ========================================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@600;700;800&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&display=swap');
+
+.hms-dashboard {
+  --clr-primary: #0B4F6C;
+  --clr-primary-light: #14748C;
+  --clr-teal-50: #EAF4F6;
+  --clr-amber: #F5A623;
+  --clr-amber-50: #FEF3E0;
+  --clr-coral: #E5484D;
+  --clr-coral-50: #FCEAEA;
+  --clr-green: #1BA672;
+  --clr-green-50: #E7F6EF;
+  --clr-slate: #667085;
+  --clr-ink: #101828;
+  --clr-border: #E4E9F0;
+  --clr-surface: #FFFFFF;
+  --clr-bg: #F4F7FA;
+
+  background: var(--clr-bg);
+  padding: 4px 4px 8px;
+  font-family: 'Inter', -apple-system, sans-serif;
+  color: var(--clr-ink);
+}
+
+.hms-dashboard * { box-sizing: border-box; }
+
+.hms-mono { font-family: 'IBM Plex Mono', 'Courier New', monospace; }
+
+/* ---------- Top line ---------- */
+.hms-topline {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 24px;
+  flex-wrap: wrap;
+  background: linear-gradient(135deg, var(--clr-primary) 0%, var(--clr-primary-light) 100%);
+  border-radius: 14px;
+  padding: 28px 30px;
+  margin-bottom: 22px;
+  box-shadow: 0 8px 24px rgba(11, 79, 108, 0.18);
+}
+
+.hms-eyebrow {
+  display: inline-block;
+  font-family: 'Inter', sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.7);
+  margin-bottom: 8px;
+}
+
+.hms-title {
+  font-family: 'Manrope', sans-serif;
+  font-weight: 800;
+  font-size: 26px;
+  color: #fff;
+  margin: 0 0 6px;
+  letter-spacing: -0.01em;
+}
+
+.hms-subtitle {
+  color: rgba(255,255,255,0.78);
+  font-size: 14px;
+  margin: 0;
+  max-width: 560px;
+  line-height: 1.5;
+}
+
+.hms-live-chip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255,255,255,0.14);
+  border: 1px solid rgba(255,255,255,0.28);
+  color: #fff;
+  padding: 9px 16px;
+  border-radius: 100px;
+  font-size: 12.5px;
+  font-weight: 600;
+  white-space: nowrap;
+  backdrop-filter: blur(4px);
+}
+
+.hms-live-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #3DDC97;
+  box-shadow: 0 0 0 0 rgba(61, 220, 151, 0.6);
+  animation: hms-pulse 2s infinite;
+}
+
+@keyframes hms-pulse {
+  0%   { box-shadow: 0 0 0 0 rgba(61, 220, 151, 0.55); }
+  70%  { box-shadow: 0 0 0 7px rgba(61, 220, 151, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(61, 220, 151, 0); }
+}
+
+/* ---------- Vitals strip (signature element) ---------- */
+.hms-vitals {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 14px;
+  margin-bottom: 16px;
+}
+
+@media (max-width: 1200px) { .hms-vitals { grid-template-columns: repeat(3, 1fr); } }
+@media (max-width: 640px)  { .hms-vitals { grid-template-columns: repeat(2, 1fr); } }
+
+.hms-vital {
+  position: relative;
+  background: var(--clr-surface);
+  border: 1px solid var(--clr-border);
+  border-radius: 12px;
+  padding: 16px 16px 14px;
+  overflow: hidden;
+  transition: transform .15s ease, box-shadow .15s ease;
+  text-decoration: none;
+  display: block;
+}
+
+.hms-vital:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 24px rgba(16, 24, 40, 0.08);
+  text-decoration: none;
+}
+
+.hms-vital::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 3px;
+  background: var(--bar-color, var(--clr-primary));
+}
+
+.hms-vital[data-tone="teal"]   { --bar-color: var(--clr-primary-light); }
+.hms-vital[data-tone="green"]  { --bar-color: var(--clr-green); }
+.hms-vital[data-tone="amber"]  { --bar-color: var(--clr-amber); }
+.hms-vital[data-tone="coral"]  { --bar-color: var(--clr-coral); }
+.hms-vital[data-tone="ink"]    { --bar-color: #344054; }
+
+.hms-vital-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.hms-vital-label {
+  font-size: 11.5px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--clr-slate);
+}
+
+.hms-vital-head i {
+  font-size: 13px;
+  color: var(--bar-color, var(--clr-primary));
+  opacity: 0.85;
+}
+
+.hms-vital-value {
+  font-family: 'IBM Plex Mono', monospace;
+  font-weight: 600;
+  font-size: 30px;
+  line-height: 1;
+  color: var(--clr-ink);
+  margin-bottom: 10px;
+}
+
+.hms-vital-link {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--clr-primary);
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+.hms-vital-link i { font-size: 10px; transition: transform .15s ease; }
+.hms-vital:hover .hms-vital-link i { transform: translateX(2px); }
+
+/* ---------- Status chips row ---------- */
+.hms-chips {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin-bottom: 22px;
+}
+@media (max-width: 900px) { .hms-chips { grid-template-columns: repeat(2, 1fr); } }
+
+.hms-chip {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--clr-surface);
+  border: 1px solid var(--clr-border);
+  border-radius: 10px;
+  padding: 12px 14px;
+  font-size: 13px;
+  color: var(--clr-slate);
+}
+
+.hms-chip strong {
+  margin-left: auto;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 15px;
+  color: var(--clr-ink);
+}
+
+.hms-chip-dot {
+  width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0;
+}
+.dot-success { background: var(--clr-green); }
+.dot-muted   { background: #98A2B3; }
+.dot-info    { background: var(--clr-primary-light); }
+.dot-warn    { background: var(--clr-amber); }
+
+/* ---------- Panels / tables ---------- */
+.hms-panel {
+  background: var(--clr-surface);
+  border: 1px solid var(--clr-border);
+  border-radius: 12px;
+  overflow: hidden;
+  margin-bottom: 22px;
+  height: 100%;
+}
+
+.hms-panel-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 18px;
+  border-bottom: 1px solid var(--clr-border);
+}
+
+.hms-panel-title {
+  font-family: 'Manrope', sans-serif;
+  font-weight: 700;
+  font-size: 15px;
+  color: var(--clr-ink);
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.hms-panel-title i { color: var(--clr-primary-light); font-size: 13px; }
+
+.hms-panel-link {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--clr-primary);
+}
+
+.hms-table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+.hms-table thead th {
+  text-align: left;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--clr-slate);
+  padding: 10px 18px;
+  background: #FAFBFC;
+  border-bottom: 1px solid var(--clr-border);
+}
+.hms-table tbody td {
+  padding: 12px 18px;
+  border-bottom: 1px solid #F0F2F5;
+  vertical-align: middle;
+  color: var(--clr-ink);
+}
+.hms-table tbody tr:last-child td { border-bottom: none; }
+.hms-table tbody tr:hover { background: #FAFBFC; }
+
+.hms-avatar {
+  width: 30px; height: 30px;
+  border-radius: 50%;
+  display: inline-flex; align-items: center; justify-content: center;
+  font-family: 'Manrope', sans-serif;
+  font-weight: 700;
+  font-size: 12px;
+  color: #fff;
+  margin-right: 10px;
+  background: var(--clr-primary-light);
+  vertical-align: middle;
+}
+
+.hms-name-cell { display: flex; align-items: center; }
+
+.hms-badge {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 3px 10px;
+  border-radius: 100px;
+  letter-spacing: 0.02em;
+}
+.hms-badge-primary  { background: var(--clr-teal-50); color: var(--clr-primary); }
+.hms-badge-success  { background: var(--clr-green-50); color: var(--clr-green); }
+.hms-badge-warning  { background: var(--clr-amber-50); color: #B7791F; }
+.hms-badge-info     { background: var(--clr-teal-50); color: var(--clr-primary-light); }
+.hms-badge-muted    { background: #F2F4F7; color: #667085; }
+
+.hms-empty {
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--clr-slate);
+  font-size: 13px;
+}
+
+.hms-footer-note {
+  text-align: center;
+  color: #98A2B3;
+  font-size: 12px;
+  padding: 6px 0 2px;
+}

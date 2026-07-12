@@ -160,6 +160,207 @@ class Doctor_model extends CI_Model
         return $doctor_id;
     }
 
+    public function get_doctor_by_user_id($user_id)
+    {
+        return $this->db
+            ->select('d.id, d.user_id, d.department_id, d.specialization, d.qualification, d.consultation_fee, d.available_days, d.status')
+            ->select('u.name, u.email, u.phone')
+            ->select('dept.department_name AS department')
+            ->from($this->table . ' d')
+            ->join('users u', 'u.id = d.user_id', 'inner')
+            ->join('departments dept', 'dept.id = d.department_id', 'left')
+            ->where('d.user_id', (int) $user_id)
+            ->limit(1)
+            ->get()
+            ->row();
+    }
+
+    public function get_dashboard_counts($doctor_user_id)
+    {
+        return array(
+            'today_appointments' => $this->count_appointments($doctor_user_id, array(
+                'date' => date('Y-m-d')
+            )),
+            'assigned_patients' => $this->count_assigned_patients($doctor_user_id),
+            'prescriptions' => $this->count_doctor_prescriptions($doctor_user_id),
+            'lab_requests' => $this->count_doctor_lab_requests($doctor_user_id)
+        );
+    }
+
+    public function get_appointments($doctor_user_id, $filters = array(), $limit = null, $offset = 0)
+    {
+        $this->doctor_appointment_scope($doctor_user_id);
+        $this->doctor_appointment_filters($filters);
+
+        if ($limit !== null) {
+            $this->db->limit((int) $limit, (int) $offset);
+        }
+
+        return $this->db
+            ->order_by('a.appointment_date', 'DESC')
+            ->order_by('a.appointment_time', 'DESC')
+            ->get()
+            ->result();
+    }
+
+    public function count_appointments($doctor_user_id, $filters = array())
+    {
+        $this->db
+            ->from('appointments a')
+            ->join('patients p', 'p.id = a.patient_id', 'inner')
+            ->where('a.doctor_id', (int) $doctor_user_id);
+
+        $this->doctor_appointment_filters($filters, false);
+
+        return (int) $this->db->count_all_results();
+    }
+
+    public function get_appointment($doctor_user_id, $appointment_id)
+    {
+        $this->doctor_appointment_scope($doctor_user_id);
+
+        return $this->db
+            ->where('a.id', (int) $appointment_id)
+            ->limit(1)
+            ->get()
+            ->row();
+    }
+
+    public function get_assigned_patients($doctor_user_id, $filters = array(), $limit = null, $offset = 0)
+    {
+        $this->db
+            ->select('p.id, p.patient_code, p.full_name AS name, p.phone AS mobile, p.email, p.gender')
+            ->select("TIMESTAMPDIFF(YEAR, p.dob, CURDATE()) AS age", false)
+            ->select('MAX(CONCAT(a.appointment_date, " ", a.appointment_time)) AS latest_appointment_at', false)
+            ->select('COUNT(a.id) AS appointment_count', false)
+            ->from('appointments a')
+            ->join('patients p', 'p.id = a.patient_id', 'inner')
+            ->where('a.doctor_id', (int) $doctor_user_id);
+
+        if (!empty($filters['search'])) {
+            $search = trim($filters['search']);
+            $this->db->group_start()
+                ->like('p.patient_code', $search)
+                ->or_like('p.full_name', $search)
+                ->or_like('p.phone', $search)
+                ->or_like('p.email', $search)
+                ->group_end();
+        }
+
+        $this->db->group_by('p.id');
+        $this->db->order_by('latest_appointment_at', 'DESC');
+
+        if ($limit !== null) {
+            $this->db->limit((int) $limit, (int) $offset);
+        }
+
+        return $this->db->get()->result();
+    }
+
+    public function count_assigned_patients($doctor_user_id, $filters = array())
+    {
+        $this->db
+            ->select('COUNT(DISTINCT p.id) AS total', false)
+            ->from('appointments a')
+            ->join('patients p', 'p.id = a.patient_id', 'inner')
+            ->where('a.doctor_id', (int) $doctor_user_id);
+
+        if (!empty($filters['search'])) {
+            $search = trim($filters['search']);
+            $this->db->group_start()
+                ->like('p.patient_code', $search)
+                ->or_like('p.full_name', $search)
+                ->or_like('p.phone', $search)
+                ->or_like('p.email', $search)
+                ->group_end();
+        }
+
+        $row = $this->db->get()->row();
+
+        return $row ? (int) $row->total : 0;
+    }
+
+    public function get_assigned_patient($doctor_user_id, $patient_id)
+    {
+        return $this->db
+            ->select('p.id, p.patient_code, p.full_name AS name, p.phone AS mobile, p.email, p.gender')
+            ->select("TIMESTAMPDIFF(YEAR, p.dob, CURDATE()) AS age", false)
+            ->from('patients p')
+            ->join('appointments a', 'a.patient_id = p.id', 'inner')
+            ->where('p.id', (int) $patient_id)
+            ->where('a.doctor_id', (int) $doctor_user_id)
+            ->group_by('p.id')
+            ->limit(1)
+            ->get()
+            ->row();
+    }
+
+    protected function doctor_appointment_scope($doctor_user_id)
+    {
+        $this->db
+            ->select('a.id AS appointment_id, a.appointment_code, a.patient_id, a.doctor_id, a.appointment_date, a.appointment_time, a.reason, a.notes, a.status, a.created_at')
+            ->select('p.patient_code, p.full_name AS patient_name, p.phone AS patient_mobile, p.gender AS patient_gender')
+            ->select("TIMESTAMPDIFF(YEAR, p.dob, CURDATE()) AS patient_age", false)
+            ->select('u.name AS doctor_name, u.email AS doctor_email')
+            ->select('dept.department_name')
+            ->from('appointments a')
+            ->join('patients p', 'p.id = a.patient_id', 'inner')
+            ->join('users u', 'u.id = a.doctor_id', 'inner')
+            ->join('departments dept', 'dept.id = u.department_id', 'left')
+            ->where('a.doctor_id', (int) $doctor_user_id);
+    }
+
+    protected function doctor_appointment_filters($filters = array(), $include_doctor_condition = true)
+    {
+        if (!empty($filters['search'])) {
+            $search = trim($filters['search']);
+            $this->db->group_start()
+                ->like('a.appointment_code', $search)
+                ->or_like('p.patient_code', $search)
+                ->or_like('p.full_name', $search)
+                ->or_like('p.phone', $search)
+                ->or_like('a.reason', $search)
+                ->or_like('a.status', $search)
+                ->group_end();
+        }
+
+        if (!empty($filters['status'])) {
+            $this->db->where('a.status', $filters['status']);
+        }
+
+        if (!empty($filters['date'])) {
+            $this->db->where('a.appointment_date', $filters['date']);
+        }
+
+        if (!empty($filters['appointment_date'])) {
+            $this->db->where('a.appointment_date', $filters['appointment_date']);
+        }
+
+        if (!empty($filters['date_from'])) {
+            $this->db->where('a.appointment_date >=', $filters['date_from']);
+        }
+
+        if (!empty($filters['date_to'])) {
+            $this->db->where('a.appointment_date <=', $filters['date_to']);
+        }
+    }
+
+    protected function count_doctor_prescriptions($doctor_user_id)
+    {
+        return (int) $this->db
+            ->from('prescriptions')
+            ->where('doctor_id', (int) $doctor_user_id)
+            ->count_all_results();
+    }
+
+    protected function count_doctor_lab_requests($doctor_user_id)
+    {
+        return (int) $this->db
+            ->from('patient_lab_tests')
+            ->where('doctor_id', (int) $doctor_user_id)
+            ->count_all_results();
+    }
+
 public function update_profile($id, $data)
 {
     // DEBUG: Log the data being passed
