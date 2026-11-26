@@ -75,10 +75,11 @@ $query_builder = TRUE;
 
 $db['default'] = array(
     'dsn'      => '',
-    'hostname' => 'localhost',
-    'username' => 'root',
-    'password' => '',
-    'database' => 'hms',
+    // Local XAMPP defaults; a server sets HMS_DB_HOST, HMS_DB_USER, HMS_DB_PASSWORD and HMS_DB_NAME.
+    'hostname' => getenv('HMS_DB_HOST') ?: 'localhost',
+    'username' => getenv('HMS_DB_USER') ?: 'root',
+    'password' => getenv('HMS_DB_PASSWORD') ?: '',
+    'database' => getenv('HMS_DB_NAME') ?: 'hms',
     'dbdriver' => 'mysqli',
     'dbprefix' => '',
     'pconnect' => FALSE,
