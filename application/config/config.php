@@ -23,7 +23,8 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 | a PHP script and you can easily do that on your own.
 |
 */
-$config['base_url'] = 'http://localhost/hms/';
+// Set HMS_BASE_URL on a server (for example in the Apache virtual host: SetEnv HMS_BASE_URL https://...).
+$config['base_url'] = getenv('HMS_BASE_URL') ?: 'http://localhost/hms/';
 
 /*
 |--------------------------------------------------------------------------
@@ -326,7 +327,8 @@ $config['cache_query_string'] = FALSE;
 | https://codeigniter.com/userguide3/libraries/encryption.html
 |
 */
-$config['encryption_key'] = 'hms_secure_2026_super_key';
+// Never commit a key: set HMS_ENCRYPTION_KEY on the server if the Encryption class is ever used.
+$config['encryption_key'] = getenv('HMS_ENCRYPTION_KEY') ?: '';
 
 /*
 |--------------------------------------------------------------------------
